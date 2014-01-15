@@ -4,6 +4,7 @@ Created on Tue Jan 14 19:44:49 2014
 
 @author: AlbertoEAF
 """
+import numpy as np
 
 s = np.arange(0, S)
 t = np.arange(1, T)
