@@ -24,8 +24,28 @@ S = 4 # states
 T = 9 # Time samples
 M = 2 # microphones
 N = M # sources
+Eps=0.1 #learning rate for the G matrix
 
 Y =  np.ones((M,T))
+
+def _calc_G(G,hmms,X):
+    """Returns a new G matrix after update. Each column of X contain data for different timestep"""
+    T=X.shape[1]
+    sum=0
+    for t in range(0,T):
+        phi=_calc_phi(hmms,t,X[:,t])
+        sum+=phi*X[:,t].T*G
+    G=Eps*G-Eps*1/T*sum
+    return G
+    
+def _calc_phi(hmms,t,x):
+    """Calculates phi for X for particular timestep for all HMMs"""
+    phi=[0]*N
+    for s in range(0,hmms[0].S):
+        for i in range(0,N):
+            phi[i]+=hmms[i].gamma[s,t]*((x[i]-hmms[i].mu_state[s])/hmms[i].var_state[s])
+
+    return phi
 
 class HMM:
     def __init__(self, states, length):
@@ -83,7 +103,7 @@ class HMM:
         
     def _calc_gamma(self):
         s = np.arange(0, self.S)
-        t = np.arange(0, self.S)
+        t = np.arange(0, self.S) # self.T???
         self.gamma = self.alpha[s,t]*self.beta[s,t]
         
     def _calc_xi(self):
@@ -94,6 +114,9 @@ class HMM:
         res = self.alpha[:,t-1]*self.beta[:,t] * Gsample(self.mu_state[s], self.var_state[s]).reshape(self.S,1) #* self.a[s_prime, s]  
         print res, res.shape
         return res
+    
+    def _calc_gauss_param(self):
+        self.mu_state
         
     def _mu(self):
         pass
@@ -146,3 +169,4 @@ print C
 print g
 
 print np.tile(np.array(Gsample(s, 0)),(2,3)).shape
+
