@@ -22,6 +22,7 @@ def gauss_prob(x,mean,var):
 def unmix(G, Y):
     """ Unmixes the sound recordings with the unmixing matrix G and returns the estimated X values. """
     X = np.dot(G,Y)
+    return X
 
 def AbsTotalError(A,B):
     """ Returns the absolute elementwise error between 2 matrices. """
@@ -80,6 +81,7 @@ class HMM:
     def _calc_alphas(self,x):
         # t=1 (0)
         for s in range(self.S): 
+            #self.alpha[s,0] = self.pi[s] * gauss_prob(x[0],self.mu_state[s],self.var_state[s])
             self.alpha[s,0] = self.pi[s] * Gsample(self.mu_state[s],self.var_state[s])
         # t=2,...,T (1,...,T-1)
         for t in range(1, self.T):
@@ -104,8 +106,8 @@ class HMM:
 #                for s_right in range(self.S):
 #                    self.beta[s,t] += self.beta[s_right,t+1]*Gsample(self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right]
                 s_right = np.arange(0,self.S)
-                #self.alpha[s,t] = np.sum(self.beta[s_right,t+1]*Gsample(self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
-                self.alpha[s,t] = np.sum(self.beta[s_right,t+1]*gauss_prob(x[t],self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
+                self.alpha[s,t] = np.sum(self.beta[s_right,t+1]*Gsample(self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
+                #self.alpha[s,t] = np.sum(self.beta[s_right,t+1]*gauss_prob(x[t],self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
 
     def _update_messages(self,x):
         self._calc_alphas(x)
@@ -127,7 +129,9 @@ class HMM:
         for s in range(self.S):
             for s_prime in range(self.S):
                 for t in range(self.T):
-                    res[s_prime,s,t]=self.alpha[s_prime,t]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
+                    #res[s_prime,s,t]=self.alpha[s_prime,t]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
+                    res[s_prime,s,t]=self.alpha[s_prime,t]*self.beta[s,t]*Gsample(self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
+
         print res, res.shape
         self.xi=res
         return res
