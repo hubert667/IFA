@@ -27,6 +27,25 @@ def AbsTotalError(A,B):
     """ Returns the absolute elementwise error between 2 matrices. """
     return np.sum(np.abs(A-B))
 
+def Calc_G(G,hmms,X):
+    """Returns a new G matrix after update. Each column of X contain data from different sources for the same timestep """
+    T=X.shape[1]
+    sum=0
+    for t in range(0,T):
+        phi=Calc_phi(hmms,t,X[:,t])
+        sum+=phi*X[:,t].T*G
+    G=G+Eps*G-Eps*1/T*sum
+    return G
+    
+def Calc_phi(hmms,t,x):
+    """Calculates phi for X for particular timestep for all HMMs"""
+    phi=[0]*N
+    for s in range(0,hmms[0].S):
+        for i in range(0,N):
+            phi[i]+=hmms[i].gamma[s,t]*((x[i]-hmms[i].mu_state[s])/hmms[i].var_state[s])
+
+    return phi
+
 S = 4 # states
 T = 9 # Time samples
 M = 2 # microphones
@@ -35,24 +54,7 @@ Eps=0.1 #learning rate for the G matrix
 
 Y =  np.ones((M,T))
 
-def _calc_G(G,hmms,X):
-    """Returns a new G matrix after update. Each column of X contain data for different timestep"""
-    T=X.shape[1]
-    sum=0
-    for t in range(0,T):
-        phi=_calc_phi(hmms,t,X[:,t])
-        sum+=phi*X[:,t].T*G
-    G=Eps*G-Eps*1/T*sum
-    return G
-    
-def _calc_phi(hmms,t,x):
-    """Calculates phi for X for particular timestep for all HMMs"""
-    phi=[0]*N
-    for s in range(0,hmms[0].S):
-        for i in range(0,N):
-            phi[i]+=hmms[i].gamma[s,t]*((x[i]-hmms[i].mu_state[s])/hmms[i].var_state[s])
 
-    return phi
 
 class HMM:
     def __init__(self, states, length):
@@ -63,8 +65,8 @@ class HMM:
         self.state = np.zeros(length,dtype=int)        
         
         # store mu and var for each state
-        self.mu_state  = np.random.randn(length)*10
-        self.var_state = np.random.gamma(1,1,length)
+        self.mu_state  = np.random.randn(states)*10
+        self.var_state = np.random.gamma(1,1,states)
 #        self.w_state =  np.random.gamma(1,1,())       
         
         self.alpha = np.empty((states, length))        
@@ -110,9 +112,8 @@ class HMM:
         self._calc_betas(x)
         
     def _calc_gamma(self):
-        s = np.arange(0, self.S)
-        t = np.arange(0, self.S) # self.T???
-        self.gamma = np.multiply(self.alpha[s,t],self.beta[s,t])
+
+        self.gamma = np.multiply(self.alpha,self.beta)
         #this trick with arange won't work:TypeError: only integer arrays with one element can be converted to an index
         
     def _calc_xi(self,x):
@@ -130,9 +131,14 @@ class HMM:
         print res, res.shape
         self.xi=res
         return res
-    
+
     def _calc_gauss_param(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
+        
+        self._update_messages(x)
+        self._calc_gamma()
+        self._calc_xi(x)
+        
         for s in range(0,S):
             numerator=0;
             for t in range(0,T):
@@ -157,6 +163,7 @@ class HMM:
     def _mu(self):
         pass
 
+"""
     
 G = np.ones((M,N))    
         
@@ -205,4 +212,4 @@ print C
 print g
 
 print np.tile(np.array(Gsample(s, 0)),(2,3)).shape
-
+"""
