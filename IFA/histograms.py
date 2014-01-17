@@ -7,6 +7,7 @@ Created on Tue Jan 14 01:55:52 2014
 
 import numpy as np
 import matplotlib.pyplot as plt
+from math import *
 
 import sys
 

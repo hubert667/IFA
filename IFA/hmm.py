@@ -6,11 +6,18 @@ Created on Tue Jan 14 02:25:10 2014
 """
 
 import numpy as np
+import math as mt
+import scipy.stats
 
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
 
     return np.random.standard_normal(1)*stddev + mean
+
+def gauss_prob(x,mean,var):
+    """Returns probability of sampling x from the gaussian"""
+    return scipy.stats.norm(mean,var).pdf(x)
+
 
 def unmix(G, Y):
     """ Unmixes the sound recordings with the unmixing matrix G and returns the estimated X values. """
@@ -24,8 +31,28 @@ S = 4 # states
 T = 9 # Time samples
 M = 2 # microphones
 N = M # sources
+Eps=0.1 #learning rate for the G matrix
 
 Y =  np.ones((M,T))
+
+def _calc_G(G,hmms,X):
+    """Returns a new G matrix after update. Each column of X contain data for different timestep"""
+    T=X.shape[1]
+    sum=0
+    for t in range(0,T):
+        phi=_calc_phi(hmms,t,X[:,t])
+        sum+=phi*X[:,t].T*G
+    G=Eps*G-Eps*1/T*sum
+    return G
+    
+def _calc_phi(hmms,t,x):
+    """Calculates phi for X for particular timestep for all HMMs"""
+    phi=[0]*N
+    for s in range(0,hmms[0].S):
+        for i in range(0,N):
+            phi[i]+=hmms[i].gamma[s,t]*((x[i]-hmms[i].mu_state[s])/hmms[i].var_state[s])
+
+    return phi
 
 class HMM:
     def __init__(self, states, length):
@@ -48,15 +75,15 @@ class HMM:
         
         self.a = np.ones((states,states)) / states # rows: s', cols: s
       
-    def _calc_alphas(self):
+    def _calc_alphas(self,x):
         # t=1 (0)
         for s in range(self.S): 
             self.alpha[s,0] = self.pi[s] * Gsample(self.mu_state[s],self.var_state[s])
         # t=2,...,T (1,...,T-1)
         for t in range(1, self.T):
             for s in range(self.S):
-                x_sample = Gsample(self.mu_state[s],self.var_state[s])
-        
+                #x_sample = Gsample(self.mu_state[s],self.var_state[s])
+                x_sample=x[t]
 #                sum_transitions = 0        
 #                for s_left in range(self.S):
 #                    sum_transitions += self.alpha[s_left,t-1]*self.a[s_left,s]
@@ -64,7 +91,7 @@ class HMM:
                 s_left = np.arange(0,self.S)
                 self.alpha[s,t] = x_sample * np.dot(self.alpha[s_left,t-1], self.a[s_left,s])
                 
-    def _calc_betas(self):
+    def _calc_betas(self,x):
         # t = T (T-1)
         # The beta message is already 1 for any beta(s_T).
     
@@ -75,25 +102,57 @@ class HMM:
 #                for s_right in range(self.S):
 #                    self.beta[s,t] += self.beta[s_right,t+1]*Gsample(self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right]
                 s_right = np.arange(0,self.S)
-                self.alpha[s,t] = np.sum(self.beta[s_right,t+1]*Gsample(self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
+                #self.alpha[s,t] = np.sum(self.beta[s_right,t+1]*Gsample(self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
+                self.alpha[s,t] = np.sum(self.beta[s_right,t+1]*gauss_prob(x[t],self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
 
-    def _update_messages(self):
-        self._calc_alphas()
-        self._calc_betas()
+    def _update_messages(self,x):
+        self._calc_alphas(x)
+        self._calc_betas(x)
         
     def _calc_gamma(self):
         s = np.arange(0, self.S)
-        t = np.arange(0, self.S)
-        self.gamma = self.alpha[s,t]*self.beta[s,t]
+        t = np.arange(0, self.S) # self.T???
+        self.gamma = np.multiply(self.alpha[s,t],self.beta[s,t])
+        #this trick with arange won't work:TypeError: only integer arrays with one element can be converted to an index
         
-    def _calc_xi(self):
-        s = np.arange(0, self.S)
-        s_prime = s        
-        t = np.arange(1, self.T)
+    def _calc_xi(self,x):
+        
+        #s = np.arange(0, self.S)
+        #s_prime = s        
+        #t = np.arange(1, self.T)
         #return self.alpha[s,t-1]*Gsample(self.mu_state[s], self.var_state[s]) * self.a[s_prime, s] * self.beta[s,t]
-        res = self.alpha[:,t-1]*self.beta[:,t] * Gsample(self.mu_state[s], self.var_state[s]).reshape(self.S,1) #* self.a[s_prime, s]  
+        #res = self.alpha[:,t-1]*self.beta[:,t] * Gsample(self.mu_state[s], self.var_state[s]).reshape(self.S,1) #* self.a[s_prime, s]  
+        res=np.zeros((self.S,self.S,self.T))
+        for s in range(self.S):
+            for s_prime in range(self.S):
+                for t in range(self.T):
+                    res[s_prime,s,t]=self.alpha[s_prime,t]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
         print res, res.shape
+        self.xi=res
         return res
+    
+    def _calc_gauss_param(self,x):
+        """Updates a,mean and variance. x contains data only for particular source"""
+        for s in range(0,S):
+            numerator=0;
+            for t in range(0,T):
+                numerator+=np.sum(self.gamma[s,t]*x[t])
+            denominator=np.sum(self.gamma[s,:])
+            self.mu_state[s]=numerator/denominator
+            
+            sum=0
+            for tt in range(0,T):
+                sum+=self.gamma[s,tt]*mt.pow((x[t]-self.mu_state[s]),2)
+            self.var_state[s]=sum/denominator
+            
+            for s_prime in range(0,S):
+                numerator=0
+                denominator=0
+                for t in range(0,T):
+                    numerator+=self.xi[s_prime,s,t]
+                    denominator+=self.gamma[s_prime,t] #should for t-1 so from 0 to T-1 for denominator?????????? 
+            self.a[s_prime,s]=numerator/denominator
+            
         
     def _mu(self):
         pass
@@ -146,3 +205,4 @@ print C
 print g
 
 print np.tile(np.array(Gsample(s, 0)),(2,3)).shape
+
