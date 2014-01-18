@@ -22,6 +22,7 @@ def gauss_prob(x,mean,var):
 def unmix(G, Y):
     """ Unmixes the sound recordings with the unmixing matrix G and returns the estimated X values. """
     X = np.dot(G,Y)
+    return X
 
 def AbsTotalError(A,B):
     """ Returns the absolute elementwise error between 2 matrices. """
@@ -50,7 +51,7 @@ S = 4 # states
 T = 9 # Time samples
 M = 2 # microphones
 N = M # sources
-Eps=0.1 #learning rate for the G matrix
+Eps=0.001 #learning rate for the G matrix
 
 Y =  np.ones((M,T))
 
@@ -80,18 +81,21 @@ class HMM:
     def _calc_alphas(self,x):
         # t=1 (0)
         for s in range(self.S): 
-            self.alpha[s,0] = self.pi[s] * Gsample(self.mu_state[s],self.var_state[s])
+            self.alpha[s,0] = self.pi[s] * gauss_prob(x[0],self.mu_state[s],self.var_state[s])
+            #self.alpha[s,0] = self.pi[s] * Gsample(self.mu_state[s],self.var_state[s])
         # t=2,...,T (1,...,T-1)
         for t in range(1, self.T):
             for s in range(self.S):
                 #x_sample = Gsample(self.mu_state[s],self.var_state[s])
                 x_sample=x[t]
+                x_prob=gauss_prob(x[t],self.mu_state[s],self.var_state[s])
 #                sum_transitions = 0        
 #                for s_left in range(self.S):
 #                    sum_transitions += self.alpha[s_left,t-1]*self.a[s_left,s]
 #                self.alpha[s,t] = x_sample*sum_transitions
                 s_left = np.arange(0,self.S)
-                self.alpha[s,t] = x_sample * np.dot(self.alpha[s_left,t-1], self.a[s_left,s])
+                #self.alpha[s,t] = x_sample * np.dot(self.alpha[s_left,t-1], self.a[s_left,s])
+                self.alpha[s,t] = x_prob * np.dot(self.alpha[s_left,t-1], self.a[s_left,s])
                 
     def _calc_betas(self,x):
         # t = T (T-1)
@@ -105,8 +109,9 @@ class HMM:
 #                    self.beta[s,t] += self.beta[s_right,t+1]*Gsample(self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right]
                 s_right = np.arange(0,self.S)
                 #self.alpha[s,t] = np.sum(self.beta[s_right,t+1]*Gsample(self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
-                self.alpha[s,t] = np.sum(self.beta[s_right,t+1]*gauss_prob(x[t],self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
-
+                self.beta[s,t] = np.sum(self.beta[s_right,t+1]*gauss_prob(x[t],self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
+                
+        #print self.beta
     def _update_messages(self,x):
         self._calc_alphas(x)
         self._calc_betas(x)
@@ -114,6 +119,7 @@ class HMM:
     def _calc_gamma(self):
 
         self.gamma = np.multiply(self.alpha,self.beta)
+        #print self.gamma
         #this trick with arange won't work:TypeError: only integer arrays with one element can be converted to an index
         
     def _calc_xi(self,x):
@@ -128,7 +134,9 @@ class HMM:
             for s_prime in range(self.S):
                 for t in range(self.T):
                     res[s_prime,s,t]=self.alpha[s_prime,t]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
-        print res, res.shape
+                    #res[s_prime,s,t]=self.alpha[s_prime,t]*self.beta[s,t]*Gsample(self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
+
+        #print res, res.shape
         self.xi=res
         return res
 
@@ -158,7 +166,7 @@ class HMM:
                     numerator+=self.xi[s_prime,s,t]
                     denominator+=self.gamma[s_prime,t] #should for t-1 so from 0 to T-1 for denominator?????????? 
             self.a[s_prime,s]=numerator/denominator
-            
+        #print self.a
         
     def _mu(self):
         pass
