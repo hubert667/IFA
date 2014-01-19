@@ -103,7 +103,7 @@ class HMM:
     def _xi(self, x, s_prime, s, t):
         return self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
 
-    def _calc_gauss_param(self,x):
+    def update(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
         
         self._calc_alphas(x)
@@ -111,29 +111,17 @@ class HMM:
         
         self._calc_gamma()
         
-        for s in range(0,S):
-            numerator=0;
-            for t in range(0,T):
-                numerator+=np.sum(self.gamma[s,t]*x[t])
-            denominator=np.sum(self.gamma[s,:])
-            self.mu_state[s]=numerator/denominator
+        for s in range(self.S):
+            sum_gamma = np.sum(self.gamma[s])
             
-            sum=0
-            for tt in range(0,T):
-                sum+=self.gamma[s,tt]*mt.pow((x[t]-self.mu_state[s]),2)
-            self.var_state[s]=sum/denominator
+            self.mu_state[s] = np.dot(self.gamma[s], x) / sum_gamma
             
-            for s_prime in range(0,S):
-                numerator=0
-                denominator=0
-                for t in range(0,T):
-                    numerator+=self._xi(x,s_prime,s,t)
-                    denominator+=self.gamma[s_prime,t] #should for t-1 so from 0 to T-1 for denominator?????????? 
-            self.a[s_prime,s]=numerator/denominator
-        #print self.a
-        
-    def _mu(self):
-        pass
+            self.var_state[s]= np.dot(self.gamma[s], np.pow((x-self.mu_state[s]),2)) / sum_gamma
+            
+            for s_prime in range(self.S):
+                #should for t-1 so from 0 to T-1 for denominator?????????? 
+                self.a[s_prime,s]=np.sum(self._xi(x,s_prime,s,np.arange(self.T)))/np.sum(self.gamma[s_prime,np.arange(self.T-1)])
+
 
 """
     

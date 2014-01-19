@@ -27,13 +27,13 @@ for it in range(iterations):
         x[:,t]=unmix(G, y[:,t])
         
     for i in range(len(HMMs)):
-        HMMs[i]._calc_gauss_param(x[i,:])
+        HMMs[i].update(x[i,:])
     G=Calc_G(G,HMMs,x)
 
-print "-------------------"
-print G
-print HMMs[0].mu_state
-print HMMs[0].var_state
-print HMMs[1].mu_state
-print HMMs[1].var_state
+    print "-------------------"
+    print G
+    print HMMs[0].mu_state
+    print HMMs[0].var_state
+    print HMMs[1].mu_state
+    print HMMs[1].var_state
 #print HMMs[0].gamma
