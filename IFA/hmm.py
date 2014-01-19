@@ -51,7 +51,7 @@ S = 4 # states
 T = 9 # Time samples
 M = 2 # microphones
 N = M # sources
-Eps=0.001 #learning rate for the G matrix
+Eps=0.00000000001 #learning rate for the G matrix
 
 Y =  np.ones((M,T))
 
@@ -100,7 +100,7 @@ class HMM:
     def _calc_gamma(self):
         self.gamma = np.multiply(self.alpha, self.beta)
         
-    def _xi(self, x, s_prime, s, t):
+    def xi(self, x, s_prime, s, t):
         return self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
 
     def update(self,x):
@@ -120,8 +120,12 @@ class HMM:
             
             for s_prime in range(self.S):
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
-                self.a[s_prime,s]=np.sum(self._xi(x,s_prime,s,np.arange(self.T)))/np.sum(self.gamma[s_prime,np.arange(self.T-1)])
+                self.a[s_prime,s]=np.sum(self.xi(x, s_prime, s, np.arange(self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
 
+        self.pi = self.gamma[:,0]
+
+    def likelihood(x):
+        return np.sum(self.alpha[:,-1])
 
 """
     
@@ -175,5 +179,6 @@ print np.tile(np.array(Gsample(s, 0)),(2,3)).shape
 """
 
 a = HMM(S,T)
-x = np.arange(T)
+x = [ Gsample(0,2) for i in range(T) ]
+#x = np.arange(T)
 a.update(x)
