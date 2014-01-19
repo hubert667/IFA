@@ -28,17 +28,19 @@ def AbsTotalError(A,B):
     """ Returns the absolute elementwise error between 2 matrices. """
     return np.sum(np.abs(A-B))
 
-def Calc_G(G,hmms,X):
+def G (G, hmms, X):
     """Returns a new G matrix after update. Each column of X contain data from different sources for the same timestep """
-    T=X.shape[1]
+    T = X.shape[1]
     sum=0
-    for t in range(0,T):
-        phi=Calc_phi(hmms,t,X[:,t])
+    
+    for t in range(T):
+        phi = phi(hmms,t,X[:,t])
         sum+=phi*X[:,t].T*G
+        print (phi*X[:,t].T).shape
     G=G+Eps*G-Eps*1/T*sum
     return G
     
-def Calc_phi(hmms,t,X):
+def phi(hmms,t,X):
     """Calculates phi for X for particular timestep for all HMMs"""
     phi = np.zeros(X.shape[0])
 
@@ -100,8 +102,16 @@ class HMM:
     def _calc_gamma(self):
         self.gamma = np.multiply(self.alpha, self.beta)
         
-    def xi(self, x, s_prime, s, t):
-        return self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
+    def xi(self, x, s_prime, s, t_):
+        t_ = np.array(t_)
+        xi = np.zeros(t_.size)
+        for t in t_:
+            assert t>0
+            assert t < self.T
+            assert s_prime < self.S and s < self.S
+            print s_prime, t-1
+            print np.arange(self.T), self.T
+            xi[t] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
 
     def update(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
@@ -120,12 +130,14 @@ class HMM:
             
             for s_prime in range(self.S):
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
-                self.a[s_prime,s]=np.sum(self.xi(x, s_prime, s, np.arange(self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
+                self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
 
         self.pi = self.gamma[:,0]
 
     def likelihood(x):
         return np.sum(self.alpha[:,-1])
+
+
 
 """
     
