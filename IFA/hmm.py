@@ -80,7 +80,7 @@ class HMM:
       
     def _calc_alphas(self,x):
         # t=1 (0)
-        self.alpha[:,0] = np.multiply(self.pi[:], gauss_prob(x[0], self.mu_state[:], self.var_state[:]))
+        self.alpha[:,0] = np.multiply(self.pi, gauss_prob(x[0], self.mu_state, self.var_state))
         
         # t=2,...,T (1,...,T-1)
         for t in range(1, self.T):
