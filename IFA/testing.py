@@ -14,7 +14,7 @@ mean2=0
 stddev2=0.5
 
 y=np.zeros((N,T))
-for t in range(0,T):
+for t in range(T):
     y[0,t]=Gsample(mean1,stddev1)
     y[1,t]=Gsample(mean2,stddev2)
 
@@ -23,7 +23,7 @@ for t in range(0,T):
 iterations=10
 x=np.zeros((N,T))
 for it in range(iterations):
-    for t in range(0,T):
+    for t in range(T):
         x[:,t]=unmix(G, y[:,t])
         
     for i in range(len(HMMs)):
