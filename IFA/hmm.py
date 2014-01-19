@@ -79,61 +79,37 @@ class HMM:
         self.a = np.ones((states,states)) / states # rows: s', cols: s
       
     def _calc_alphas(self,x):
-        # t=1 (0)
+        # t=1 (t = 0)
         self.alpha[:,0] = np.multiply(self.pi, gauss_prob(x[0], self.mu_state, self.var_state))
         
-        # t=2,...,T (1,...,T-1)
+        # t=2,...,T (t = 1,...,T-1)
         for t in range(1, self.T):
             for s in range(self.S):
                 x_prob = gauss_prob(x[t], self.mu_state[s], self.var_state[s])
                 self.alpha[s,t] = x_prob * np.dot(self.alpha[:,t-1], self.a[:,s])
                 
     def _calc_betas(self,x):
-        # t = T (T-1)
-        # The beta message is already 1 for any beta(s_T).
-    
-        # t = 1,...,T-1 (0,...,T-2)
+        # t = T (t = T-1)
+        # self.beta[:,self.T-1] = 1 # already done by the initialization
+        
+        # t = 1,...,T-1 (t = 0,...,T-2)
         for t in range(self.T-2, -1, -1):
             for s in range(self.S):
-#                self.beta[s,t] = 0
-#                for s_right in range(self.S):
-#                    self.beta[s,t] += self.beta[s_right,t+1]*Gsample(self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right]
-                s_right = np.arange(0,self.S)
-                #self.alpha[s,t] = np.sum(self.beta[s_right,t+1]*Gsample(self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
-                self.beta[s,t] = np.sum(self.beta[s_right,t+1]*gauss_prob(x[t],self.mu_state[s_right],self.var_state[s_right])*self.a[s,s_right])
+                self.beta[s,t] = np.dot(self.beta[:,t+1], np.multiply(gauss_prob(x[t+1], self.mu_state, self.var_state), self.a[s,:]))
                 
-        #print self.beta
-    def _update_messages(self,x):
-        self._calc_alphas(x)
-        self._calc_betas(x)
-        
     def _calc_gamma(self):
-        self.gamma = np.multiply(self.alpha,self.beta)
+        self.gamma = np.multiply(self.alpha, self.beta)
         
-    def _calc_xi(self,x):
-        
-        #s = np.arange(0, self.S)
-        #s_prime = s        
-        #t = np.arange(1, self.T)
-        #return self.alpha[s,t-1]*Gsample(self.mu_state[s], self.var_state[s]) * self.a[s_prime, s] * self.beta[s,t]
-        #res = self.alpha[:,t-1]*self.beta[:,t] * Gsample(self.mu_state[s], self.var_state[s]).reshape(self.S,1) #* self.a[s_prime, s]  
-        res=np.zeros((self.S,self.S,self.T))
-        for s in range(self.S):
-            for s_prime in range(self.S):
-                for t in range(self.T):
-                    res[s_prime,s,t]=self.alpha[s_prime,t]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
-                    #res[s_prime,s,t]=self.alpha[s_prime,t]*self.beta[s,t]*Gsample(self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
-
-        #print res, res.shape
-        self.xi=res
-        return res
+    def _xi(self, x, s_prime, s, t):
+        return self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
 
     def _calc_gauss_param(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
         
-        self._update_messages(x)
+        self._calc_alphas(x)
+        self._calc_betas(x)
+        
         self._calc_gamma()
-        self._calc_xi(x)
         
         for s in range(0,S):
             numerator=0;
@@ -151,7 +127,7 @@ class HMM:
                 numerator=0
                 denominator=0
                 for t in range(0,T):
-                    numerator+=self.xi[s_prime,s,t]
+                    numerator+=self._xi(x,s_prime,s,t)
                     denominator+=self.gamma[s_prime,t] #should for t-1 so from 0 to T-1 for denominator?????????? 
             self.a[s_prime,s]=numerator/denominator
         #print self.a
@@ -210,6 +186,6 @@ print g
 print np.tile(np.array(Gsample(s, 0)),(2,3)).shape
 """
 
-a = HMM(10,7)
-
-a._calc_alphas(np.arange(0,7))
+a = HMM(S,T)
+x = np.arange(T)
+a._calc_gauss_param(x)
