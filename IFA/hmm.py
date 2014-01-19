@@ -66,7 +66,7 @@ class HMM:
         self.state = np.zeros(length,dtype=int)        
         
         # store mu and var for each state
-        self.mu_state  = np.random.randn(states)*10
+        self.mu_state  = np.random.randn(states)
         self.var_state = np.random.gamma(1,1,states)
 #        self.w_state =  np.random.gamma(1,1,())       
         
