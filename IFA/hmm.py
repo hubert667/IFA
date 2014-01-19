@@ -74,28 +74,19 @@ class HMM:
         self.beta  = np.ones((states, length))
         
         
-        self.pi = np.ones((states,1))  / states # uniform prior   
+        self.pi = np.ones(states)  / states # uniform prior   
         
         self.a = np.ones((states,states)) / states # rows: s', cols: s
       
     def _calc_alphas(self,x):
         # t=1 (0)
-        for s in range(self.S): 
-            self.alpha[s,0] = self.pi[s] * gauss_prob(x[0],self.mu_state[s],self.var_state[s])
-            #self.alpha[s,0] = self.pi[s] * Gsample(self.mu_state[s],self.var_state[s])
+        self.alpha[:,0] = np.multiply(self.pi[:], gauss_prob(x[0], self.mu_state[:], self.var_state[:]))
+        
         # t=2,...,T (1,...,T-1)
         for t in range(1, self.T):
             for s in range(self.S):
-                #x_sample = Gsample(self.mu_state[s],self.var_state[s])
-                x_sample=x[t]
-                x_prob=gauss_prob(x[t],self.mu_state[s],self.var_state[s])
-#                sum_transitions = 0        
-#                for s_left in range(self.S):
-#                    sum_transitions += self.alpha[s_left,t-1]*self.a[s_left,s]
-#                self.alpha[s,t] = x_sample*sum_transitions
-                s_left = np.arange(0,self.S)
-                #self.alpha[s,t] = x_sample * np.dot(self.alpha[s_left,t-1], self.a[s_left,s])
-                self.alpha[s,t] = x_prob * np.dot(self.alpha[s_left,t-1], self.a[s_left,s])
+                x_prob = gauss_prob(x[t], self.mu_state[s], self.var_state[s])
+                self.alpha[s,t] = x_prob * np.dot(self.alpha[:,t-1], self.a[:,s])
                 
     def _calc_betas(self,x):
         # t = T (T-1)
@@ -117,10 +108,7 @@ class HMM:
         self._calc_betas(x)
         
     def _calc_gamma(self):
-
         self.gamma = np.multiply(self.alpha,self.beta)
-        #print self.gamma
-        #this trick with arange won't work:TypeError: only integer arrays with one element can be converted to an index
         
     def _calc_xi(self,x):
         
@@ -221,3 +209,7 @@ print g
 
 print np.tile(np.array(Gsample(s, 0)),(2,3)).shape
 """
+
+a = HMM(10,7)
+
+a._calc_alphas(np.arange(0,7))
