@@ -116,7 +116,7 @@ class HMM:
             
             self.mu_state[s] = np.dot(self.gamma[s], x) / sum_gamma
             
-            self.var_state[s]= np.dot(self.gamma[s], np.pow((x-self.mu_state[s]),2)) / sum_gamma
+            self.var_state[s]= np.dot(self.gamma[s], (x-self.mu_state[s])**2) / sum_gamma
             
             for s_prime in range(self.S):
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
@@ -176,4 +176,4 @@ print np.tile(np.array(Gsample(s, 0)),(2,3)).shape
 
 a = HMM(S,T)
 x = np.arange(T)
-a._calc_gauss_param(x)
+a.update(x)
