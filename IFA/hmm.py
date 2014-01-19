@@ -93,7 +93,7 @@ class HMM:
 #                for s_left in range(self.S):
 #                    sum_transitions += self.alpha[s_left,t-1]*self.a[s_left,s]
 #                self.alpha[s,t] = x_sample*sum_transitions
-                s_left = np.arange(0,self.S)
+                #s_left = np.arange(0,self.S)
                 #self.alpha[s,t] = x_sample * np.dot(self.alpha[s_left,t-1], self.a[s_left,s])
                 sum=0
                 for s_left in range(0,self.S):
@@ -153,7 +153,7 @@ class HMM:
         for s in range(0,S):
             numerator=0;
             for t in range(0,T):
-                numerator+=np.sum(self.gamma[s,t]*x[t])
+                numerator+=self.gamma[s,t]*x[t]
             denominator=np.sum(self.gamma[s,:])
             self.mu_state[s]=numerator/denominator
             
