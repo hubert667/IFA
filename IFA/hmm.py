@@ -47,8 +47,8 @@ def Calc_phi(hmms,t,x):
 
     return phi
 
-S = 4 # states
-T = 9 # Time samples
+S = 2 # states
+T = 3 # Time samples
 M = 2 # microphones
 N = M # sources
 Eps=0.001 #learning rate for the G matrix
@@ -95,7 +95,10 @@ class HMM:
 #                self.alpha[s,t] = x_sample*sum_transitions
                 s_left = np.arange(0,self.S)
                 #self.alpha[s,t] = x_sample * np.dot(self.alpha[s_left,t-1], self.a[s_left,s])
-                self.alpha[s,t] = x_prob * np.dot(self.alpha[s_left,t-1], self.a[s_left,s])
+                sum=0
+                for s_left in range(0,self.S):
+                    sum+=self.alpha[s_left,t-1]* self.a[s_left,s]
+                self.alpha[s,t] = x_prob * sum
                 
     def _calc_betas(self,x):
         # t = T (T-1)
