@@ -193,13 +193,3 @@ print g
 print np.tile(np.array(Gsample(s, 0)),(2,3)).shape
 """
 
-a = HMM(S,T)
-x = [ Gsample(0,2) for i in range(T) ]
-
-print a.alpha[0]
-a.update(x)
-print a.alpha[0]
-a.update(x)
-print a.alpha[0]
-a.update(x)
-print a.alpha[0]
