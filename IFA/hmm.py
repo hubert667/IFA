@@ -105,13 +105,14 @@ class HMM:
     def xi(self, x, s_prime, s, t_):
         t_ = np.array(t_)
         xi = np.zeros(t_.size)
-        for t in t_:
+        for i in range(len(t_)):
+            t = t_[i]
             assert t>0
             assert t < self.T
             assert s_prime < self.S and s < self.S
-            print s_prime, t-1
-            print np.arange(self.T), self.T
-            xi[t] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
+            xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
+            
+        return xi
 
     def update(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
