@@ -137,7 +137,7 @@ class HMM:
 
         self.pi = self.gamma[:,0]
 
-    def likelihood(self, x):
+    def likelihood(self):
         return np.sum(self.alpha[:,-1])
 
 
