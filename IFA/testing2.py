@@ -18,7 +18,7 @@ iterations = 5
 
 #print a.alpha[0]
 
-print a.alpha[0]/a.likelihood(x)
+print a.alpha[0]/a.likelihood()
 
 exit(1)
 
