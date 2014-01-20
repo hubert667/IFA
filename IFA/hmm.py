@@ -44,10 +44,10 @@ def Calc_phi(hmms,t,X):
     phi = np.zeros(X.shape[0])
 
     for i in range(X.shape[0]):
-        phi[i] = np.sum(hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_state[:])/hmms[i].var_state[:])
+        phi[i] = np.sum(hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_state[:])/hmms[i].var_state[:])
 
         if np.isnan(phi[i]):
-            print "phi[i]=nan", hmms[i].var_state[:], hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_state[:])
+            print "phi[i]=nan", hmms[i].var_state[:], hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_state[:])
 
     return phi
 
@@ -91,7 +91,6 @@ class HMM:
             for s in range(self.S):
                 x_prob = gauss_prob(x[t], self.mu_state[s], self.var_state[s])
                 self.alpha[s,t] = x_prob * np.dot(self.alpha[:,t-1], self.a[:,s])
-        a=np.max(self.alpha)
         self.alpha=self.alpha/self.likelihood()
                 
     def _calc_betas(self,x):
