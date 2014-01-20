@@ -20,7 +20,7 @@ for t in range(T):
 
 #so it is like using I matrix as a mixing matrix
 
-iterations=10
+iterations=3
 x=np.zeros((N,T))
 for it in range(iterations):
     for t in range(T):
@@ -28,7 +28,7 @@ for it in range(iterations):
         
     for i in range(len(HMMs)):
         HMMs[i].update(x[i,:])
-    G=Calc_G(G,HMMs,x)
+    G = Calc_G(G,HMMs,x)
 
     print "-------------------"
     print G

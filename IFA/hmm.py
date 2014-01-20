@@ -28,19 +28,20 @@ def AbsTotalError(A,B):
     """ Returns the absolute elementwise error between 2 matrices. """
     return np.sum(np.abs(A-B))
 
-def G (G, hmms, X):
+def Calc_G (G, hmms, X):
     """Returns a new G matrix after update. Each column of X contain data from different sources for the same timestep """
     T = X.shape[1]
-    sum=0
     
+    Sum=0    
     for t in range(T):
-        phi = phi(hmms,t,X[:,t])
-        sum+=phi*X[:,t].T*G
-        print (phi*X[:,t].T).shape
-    G=G+Eps*G-Eps*1/T*sum
+        phi = Calc_phi(hmms,t,X[:,t])
+        
+        Sum += phi*X[:,t].T*G
+        print "shape:", (phi*X[:,t].T).shape
+    G += Eps*(G-Sum/T)
     return G
     
-def phi(hmms,t,X):
+def Calc_phi(hmms,t,X):
     """Calculates phi for X for particular timestep for all HMMs"""
     phi = np.zeros(X.shape[0])
 
