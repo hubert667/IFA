@@ -35,9 +35,7 @@ def Calc_G (G, hmms, X):
     Sum=0    
     for t in range(T):
         phi = Calc_phi(hmms,t,X[:,t])
-        
         Sum += phi*X[:,t].T*G
-        print "shape:", (phi*X[:,t].T).shape
     G += Eps*(G-Sum/T)
     return G
     
@@ -48,10 +46,13 @@ def Calc_phi(hmms,t,X):
     for i in range(X.shape[0]):
         phi[i] = np.sum(hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_state[:])/hmms[i].var_state[:])
 
+        if np.isnan(phi[i]):
+            print "phi[i]=nan", hmms[i].var_state[:], hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_state[:])
+
     return phi
 
 S = 4 # states
-T = 9 # Time samples
+T = 90 # Time samples
 M = 2 # microphones
 N = M # sources
 Eps=0.00000000001 #learning rate for the G matrix
@@ -69,7 +70,7 @@ class HMM:
         self.state = np.zeros(length,dtype=int)        
         
         # store mu and var for each state
-        self.mu_state  = np.random.randn(states)*10
+        self.mu_state  = np.random.randn(states)
         self.var_state = np.random.gamma(1,1,states)
 #        self.w_state =  np.random.gamma(1,1,())       
         
@@ -194,5 +195,11 @@ print np.tile(np.array(Gsample(s, 0)),(2,3)).shape
 
 a = HMM(S,T)
 x = [ Gsample(0,2) for i in range(T) ]
-#x = np.arange(T)
+
+print a.alpha[0]
 a.update(x)
+print a.alpha[0]
+a.update(x)
+print a.alpha[0]
+a.update(x)
+print a.alpha[0]

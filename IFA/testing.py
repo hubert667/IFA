@@ -37,3 +37,4 @@ for it in range(iterations):
     print HMMs[1].mu_state
     print HMMs[1].var_state
 #print HMMs[0].gamma
+
