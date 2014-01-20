@@ -18,10 +18,8 @@ iterations = 5
 
 #print a.alpha[0]
 
-print a.alpha[0]/a.likelihood()
 
 
-exit(1)
 
 for i in range(iterations):
     a.update(x)
