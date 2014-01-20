@@ -25,8 +25,9 @@ exit(1)
 for i in range(iterations):
     a.update(x)
     print "------------------"
-    print a.alpha[0]
-    print a.beta[0]
+    print a.alpha
+    print a.beta
+    print a.gamma
     print a.mu_state
     print a.var_state
     print a.a
