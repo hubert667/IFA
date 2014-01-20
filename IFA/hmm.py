@@ -52,7 +52,7 @@ def Calc_phi(hmms,t,X):
     return phi
 
 S = 4 # states
-T = 90 # Time samples
+T = 9 # Time samples
 M = 2 # microphones
 N = M # sources
 Eps=0.00000000001 #learning rate for the G matrix
@@ -91,6 +91,8 @@ class HMM:
             for s in range(self.S):
                 x_prob = gauss_prob(x[t], self.mu_state[s], self.var_state[s])
                 self.alpha[s,t] = x_prob * np.dot(self.alpha[:,t-1], self.a[:,s])
+        a=np.max(self.alpha)
+        self.alpha=self.alpha/self.likelihood()
                 
     def _calc_betas(self,x):
         # t = T (t = T-1)
@@ -100,6 +102,7 @@ class HMM:
         for t in range(self.T-2, -1, -1):
             for s in range(self.S):
                 self.beta[s,t] = np.dot(self.beta[:,t+1], np.multiply(gauss_prob(x[t+1], self.mu_state, self.var_state), self.a[s,:]))
+        self.beta=self.beta/self.betaScalling()
                 
     def _calc_gamma(self):
         self.gamma = np.multiply(self.alpha, self.beta)
@@ -137,8 +140,11 @@ class HMM:
 
         self.pi = self.gamma[:,0]
 
-    def likelihood(self, x):
+    def likelihood(self):
         return np.sum(self.alpha[:,-1])
+    
+    def betaScalling(self):
+        return np.sum(self.beta[:,0])
 
 
 
