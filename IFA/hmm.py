@@ -67,12 +67,11 @@ class HMM:
         self.T = length
         
         # store the states of each node
-        self.state = np.zeros(length,dtype=int)        
+        self.states = np.zeros(length,dtype=int)        
         
         # store mu and var for each state
-        self.mu_state  = np.random.randn(states)
-        self.var_state = np.random.gamma(1,1,states)
-#        self.w_state =  np.random.gamma(1,1,())       
+        self.mu_states  = np.random.randn(states)
+        self.var_states = np.random.gamma(1,1,states)    
         
         self.alpha = np.empty((states, length))        
         self.beta  = np.ones((states, length))
@@ -87,7 +86,7 @@ class HMM:
       
     def _calc_alphas(self,x):
         # t=1 (t = 0)
-        self.alpha[:,0] = np.multiply(self.pi, gauss_prob(x[0], self.mu_state, self.var_state))
+        self.alpha[:,0] = np.multiply(self.pi, gauss_prob(x[0], self.mu_states, self.var_states))
         
         self.c[0] = np.sum(self.alpha[:,0])
         self.alpha[:,0] /= self.c[0]
@@ -95,7 +94,7 @@ class HMM:
         # t=2,...,T (t = 1,...,T-1)
         for t in range(1, self.T):
             for s in range(self.S):
-                x_prob = gauss_prob(x[t], self.mu_state[s], self.var_state[s])
+                x_prob = gauss_prob(x[t], self.mu_states[s], self.var_states[s])
                 self.alpha[s,t] = x_prob * np.dot(self.alpha[:,t-1], self.a[:,s])
                 
             self.c[t] = np.sum(self.alpha[:,t])
@@ -109,7 +108,7 @@ class HMM:
         # t = 1,...,T-1 (t = 0,...,T-2)
         for t in range(self.T-2, -1, -1):
             for s in range(self.S):
-                self.beta[s,t] = np.dot(self.beta[:,t+1], np.multiply(gauss_prob(x[t+1], self.mu_state, self.var_state), self.a[s,:]))
+                self.beta[s,t] = np.dot(self.beta[:,t+1], np.multiply(gauss_prob(x[t+1], self.mu_states, self.var_states), self.a[s,:]))
             self.beta[:,t] /= self.c[t+1]
                 
     def _calc_gamma(self):
@@ -123,7 +122,7 @@ class HMM:
             assert t>0
             assert t < self.T
             assert s_prime < self.S and s < self.S
-            xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
+            xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
             xi[i] *= self.c[t]
         return xi
 
@@ -138,9 +137,9 @@ class HMM:
         for s in range(self.S):
             sum_gamma = np.sum(self.gamma[s])
             
-            self.mu_state[s] = np.dot(self.gamma[s], x) / sum_gamma
+            self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma
             
-            self.var_state[s]= np.dot(self.gamma[s], (x-self.mu_state[s])**2) / sum_gamma
+            self.var_states[s]= np.dot(self.gamma[s], (x-self.mu_states[s])**2) / sum_gamma
             
             for s_prime in range(self.S):
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
