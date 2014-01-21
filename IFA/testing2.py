@@ -22,7 +22,7 @@ a = HMM(S,T)
 x = [ Gsample(0,1) for i in range(T) ]
 
 
-iterations = 5
+iterations = 10
 
 
 for i in range(iterations):

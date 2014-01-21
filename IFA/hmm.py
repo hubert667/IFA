@@ -54,7 +54,7 @@ def Calc_phi(hmms,t,X):
 
 Eps=0.00000000001 #learning rate for the G matrix
 
-
+MIN_variance = 1e-3
 
 class HMM:
     def __init__(self, states, length):
@@ -134,6 +134,8 @@ class HMM:
             self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma
             
             self.var_states[s]= np.dot(self.gamma[s], (x-self.mu_states[s])**2) / sum_gamma
+            # Let's update the variance but with a minimum threshold
+            self.var_states = np.maximum(self.var_states, MIN_variance)            
             
             for s_prime in range(self.S):
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
