@@ -52,13 +52,7 @@ def Calc_phi(hmms,t,X):
 
     return phi
 
-S = 4 # states
-T = 9 # Time samples
-M = 2 # microphones
-N = M # sources
 Eps=0.00000000001 #learning rate for the G matrix
-
-Y =  np.ones((M,T))
 
 
 
