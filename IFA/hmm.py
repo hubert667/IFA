@@ -45,10 +45,10 @@ def Calc_phi(hmms,t,X):
     phi = np.zeros(X.shape[0])
 
     for i in range(X.shape[0]):
-        phi[i] = np.sum(hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states[:])/hmms[i].var_state[:])
+        phi[i] = np.sum(hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states[:])/hmms[i].var_states[:])
 
         if np.isnan(phi[i]):
-            print "phi[i]=nan", hmms[i].var_state[:], hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states[:])
+            print "phi[i]=nan", hmms[i].var_states[:], hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states[:])
 
     return phi
 
