@@ -9,6 +9,7 @@ import numpy as np
 #import math as mt
 import scipy.stats
 
+
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
 
@@ -76,7 +77,7 @@ class HMM:
         self.alpha = np.empty((states, length))        
         self.beta  = np.ones((states, length))
         
-        self.beta[:, self.T-1] /= states
+        #self.beta[:, self.T-1] /= states # we assume beta should still be 1 even when rescaled - right or wrong?
         
         self.c = np.empty(length)
         
