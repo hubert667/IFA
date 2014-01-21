@@ -104,7 +104,6 @@ class HMM:
         # t = T (t = T-1)
         # self.beta[:,self.T-1] = 1 # already done by the initialization
         
-        
         # t = 1,...,T-1 (t = 0,...,T-2)
         for t in range(self.T-2, -1, -1):
             for s in range(self.S):
