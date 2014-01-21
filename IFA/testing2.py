@@ -10,7 +10,7 @@ import numpy as np
 import sys
 
 
-S = 4 # states
+S = 1 # states
 T = 9 # Time samples
 M = 2 # microphones
 N = M # sources
@@ -31,8 +31,8 @@ for i in range(iterations):
     print "alpha", a.alpha
     print "beta", a.beta
     print "gamma", a.gamma
-    print "mu", a.mu_states
-    print "var", a.var_states
+    print "mu", a.mu_state
+    print "var", a.var_state
     print "a", a.a
     
 

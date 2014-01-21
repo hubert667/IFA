@@ -9,7 +9,6 @@ import numpy as np
 #import math as mt
 import scipy.stats
 
-
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
 
@@ -52,9 +51,15 @@ def Calc_phi(hmms,t,X):
 
     return phi
 
+S = 4 # states
+T = 9 # Time samples
+M = 2 # microphones
+N = M # sources
 Eps=0.00000000001 #learning rate for the G matrix
 
-MIN_variance = 1e-3
+Y =  np.ones((M,T))
+
+
 
 class HMM:
     def __init__(self, states, length):
@@ -62,16 +67,17 @@ class HMM:
         self.T = length
         
         # store the states of each node
-        self.states = np.zeros(length,dtype=int)        
+        self.state = np.zeros(length,dtype=int)        
         
         # store mu and var for each state
-        self.mu_states  = np.random.randn(states)
-        self.var_states = np.random.gamma(1,1,states)    
+        self.mu_state  = np.random.randn(states)
+        self.var_state = np.random.gamma(1,1,states)
+#        self.w_state =  np.random.gamma(1,1,())       
         
         self.alpha = np.empty((states, length))        
         self.beta  = np.ones((states, length))
         
-        #self.beta[:, self.T-1] /= states # we assume beta should still be 1 even when rescaled - right or wrong?
+        self.beta[:, self.T-1] /= states
         
         self.c = np.empty(length)
         
@@ -81,7 +87,7 @@ class HMM:
       
     def _calc_alphas(self,x):
         # t=1 (t = 0)
-        self.alpha[:,0] = np.multiply(self.pi, gauss_prob(x[0], self.mu_states, self.var_states))
+        self.alpha[:,0] = np.multiply(self.pi, gauss_prob(x[0], self.mu_state, self.var_state))
         
         self.c[0] = np.sum(self.alpha[:,0])
         self.alpha[:,0] /= self.c[0]
@@ -89,7 +95,7 @@ class HMM:
         # t=2,...,T (t = 1,...,T-1)
         for t in range(1, self.T):
             for s in range(self.S):
-                x_prob = gauss_prob(x[t], self.mu_states[s], self.var_states[s])
+                x_prob = gauss_prob(x[t], self.mu_state[s], self.var_state[s])
                 self.alpha[s,t] = x_prob * np.dot(self.alpha[:,t-1], self.a[:,s])
                 
             self.c[t] = np.sum(self.alpha[:,t])
@@ -99,10 +105,11 @@ class HMM:
         # t = T (t = T-1)
         # self.beta[:,self.T-1] = 1 # already done by the initialization
         
+        
         # t = 1,...,T-1 (t = 0,...,T-2)
         for t in range(self.T-2, -1, -1):
             for s in range(self.S):
-                self.beta[s,t] = np.dot(self.beta[:,t+1], np.multiply(gauss_prob(x[t+1], self.mu_states, self.var_states), self.a[s,:]))
+                self.beta[s,t] = np.dot(self.beta[:,t+1], np.multiply(gauss_prob(x[t+1], self.mu_state, self.var_state), self.a[s,:]))
             self.beta[:,t] /= self.c[t+1]
                 
     def _calc_gamma(self):
@@ -116,8 +123,8 @@ class HMM:
             assert t>0
             assert t < self.T
             assert s_prime < self.S and s < self.S
-            xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
-            xi[i] *= self.c[t]
+            xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
+            xi[i] /= self.c[t]
         return xi
 
     def update(self,x):
@@ -131,11 +138,9 @@ class HMM:
         for s in range(self.S):
             sum_gamma = np.sum(self.gamma[s])
             
-            self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma
+            self.mu_state[s] = np.dot(self.gamma[s], x) / sum_gamma
             
-            self.var_states[s]= np.dot(self.gamma[s], (x-self.mu_states[s])**2) / sum_gamma
-            # Let's update the variance but with a minimum threshold
-            self.var_states = np.maximum(self.var_states, MIN_variance)            
+            self.var_state[s]= np.dot(self.gamma[s], (x-self.mu_state[s])**2) / sum_gamma
             
             for s_prime in range(self.S):
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
@@ -144,4 +149,63 @@ class HMM:
         self.pi = self.gamma[:,0]
 
     def likelihood(self):
-        return np.prod(self.c)
+        l = 1
+        for n in range(self.T):
+            l *= self.c[n]
+        return l
+    
+
+
+
+
+"""
+    
+G = np.ones((M,N))    
+        
+HMMs = []
+for n in range(N):
+    HMMs.append(HMM(S,T))
+    
+a = HMMs[0]
+
+#for i in range(10):
+#    print i
+#    a._update_messages()
+
+a._update_messages()
+
+
+
+
+
+a._calc_xi()
+
+s = np.arange(0, S)
+t = np.arange(1, T)
+c = np.ones((3,1))
+d = np.arange(1,4)
+e = (c.T*d).T
+alpha = a.alpha
+beta = a.beta
+
+A = np.ones((S,T))
+B = np.ones((S,T))
+for i in range(S):
+    for j in range(T):
+        A[i,j] = i*j
+for j in range(T):
+    B[:,j] = j
+
+s = np.arange(0, S)
+t = np.arange(1, T)
+
+C = A[:,t-1]*B[:,t]
+
+g =  C * Gsample(s,s).reshape(4,1)
+
+print C
+print g
+
+print np.tile(np.array(Gsample(s, 0)),(2,3)).shape
+"""
+
