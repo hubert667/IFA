@@ -52,10 +52,10 @@ def Calc_phi(hmms,t,X):
     return phi
 
 S = 4 # states
-T = 9 # Time samples
+T = 90 # Time samples
 M = 2 # microphones
 N = M # sources
-Eps=0.00000000001 #learning rate for the G matrix
+Eps=0.0001 #learning rate for the G matrix
 
 Y =  np.ones((M,T))
 
@@ -135,7 +135,7 @@ class HMM:
         
         self._calc_gamma()
         
-        sumA=0
+        sumA=[0]*self.S
         for s in range(self.S):
             sum_gamma = np.sum(self.gamma[s])
             
@@ -147,9 +147,10 @@ class HMM:
             for s_prime in range(self.S):
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
                 self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
-                sumA+=self.a[s_prime,s]
-            
-        self.a/=sumA
+                sumA[s_prime]+=self.a[s_prime,s]
+        
+        for s_prim in range(self.S):    
+            self.a[s_prim,:]/=sumA[s_prim]
         self.pi = self.gamma[:,0]
 
     def likelihood(self):

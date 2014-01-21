@@ -9,9 +9,9 @@ for n in range(N):
     
 
 mean1=1
-stddev1=1
+stddev1=2
 mean2=0
-stddev2=0.5
+stddev2=4
 
 y=np.zeros((N,T))
 for t in range(T):
