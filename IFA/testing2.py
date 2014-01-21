@@ -10,8 +10,8 @@ import numpy as np
 import sys
 
 
-S = 1 # states
-T = 9 # Time samples
+S = 2 # states
+T = 90 # Time samples
 M = 2 # microphones
 N = M # sources
 
@@ -19,10 +19,10 @@ N = M # sources
 #Y =  np.ones((M,T))
 
 a = HMM(S,T)
-x = [ Gsample(0,1) for i in range(T) ]
+x = [ Gsample(0,4) for i in range(T) ]
 
 
-iterations = 10
+iterations = 100
 
 
 for i in range(iterations):

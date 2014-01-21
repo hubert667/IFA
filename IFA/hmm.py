@@ -124,7 +124,7 @@ class HMM:
             assert t < self.T
             assert s_prime < self.S and s < self.S
             xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_state[s],self.var_state[s])*self.a[s_prime,s]
-            xi[i] /= self.c[t]
+            xi[i] *= self.c[t]
         return xi
 
     def update(self,x):
@@ -135,6 +135,7 @@ class HMM:
         
         self._calc_gamma()
         
+        sumA=0
         for s in range(self.S):
             sum_gamma = np.sum(self.gamma[s])
             
@@ -142,10 +143,13 @@ class HMM:
             
             self.var_state[s]= np.dot(self.gamma[s], (x-self.mu_state[s])**2) / sum_gamma
             
+            
             for s_prime in range(self.S):
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
                 self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
-
+                sumA+=self.a[s_prime,s]
+            
+        self.a/=sumA
         self.pi = self.gamma[:,0]
 
     def likelihood(self):
