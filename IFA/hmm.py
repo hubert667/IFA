@@ -36,7 +36,8 @@ def Calc_G (G, hmms, X):
     Sum=0    
     for t in range(T):
         phi = Calc_phi(hmms,t,X[:,t])
-        Sum += phi*X[:,t].T*G
+        result=np.reshape(phi,(phi.shape[0],1))*X[:,t].T
+        Sum += result*G
     G += Eps*(G-Sum/T)
     return G
     
@@ -52,7 +53,7 @@ def Calc_phi(hmms,t,X):
 
     return phi
 
-Eps=0.0001 #learning rate for the G matrix
+Eps=0.01 #learning rate for the G matrix
 
 MIN_variance = 1e-30
 
@@ -117,7 +118,7 @@ class HMM:
             assert t < self.T
             assert s_prime < self.S and s < self.S
             xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
-            xi[i] *= self.c[t]
+            xi[i] /= self.c[t]
         return xi
 
     def update(self,x):

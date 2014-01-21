@@ -3,7 +3,7 @@ import numpy as np
 
 
 S = 2 # states
-T = 2000# Time samples
+T = 1000# Time samples
 M = 2 # microphones
 N = M # sources
 

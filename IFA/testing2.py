@@ -19,7 +19,7 @@ N = M # sources
 #Y =  np.ones((M,T))
 
 a = HMM(S,T)
-x = [ Gsample(2,4) for i in range(T) ]
+x = [ Gsample(0,4) for i in range(T) ]
 
 
 iterations = 10
