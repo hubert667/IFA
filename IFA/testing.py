@@ -3,21 +3,22 @@ import numpy as np
 
 
 S = 2 # states
-T = 1000# Time samples
+T = 2000# Time samples
 M = 2 # microphones
 N = M # sources
 
 G = np.random.random((N, N))  
+#G=np.identity(N)
         
 HMMs = []
 for n in range(N):
     HMMs.append(HMM(S,T))
     
 
-mean1=2
+mean1=0
 stddev1=4
-mean2=0
-stddev2=1
+mean2=1
+stddev2=2
 
 y=np.zeros((N,T))
 for t in range(T):
@@ -26,7 +27,7 @@ for t in range(T):
 
 #so it is like using I matrix as a mixing matrix
 
-iterations=10
+iterations=100
 x=np.zeros((N,T))
 for it in range(iterations):
     for t in range(T):
@@ -42,5 +43,6 @@ for it in range(iterations):
     print HMMs[0].var_states
     print HMMs[1].mu_states
     print HMMs[1].var_states
+
 #print HMMs[0].gamma
 
