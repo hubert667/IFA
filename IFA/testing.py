@@ -2,7 +2,7 @@ from hmm import *
 import numpy as np
 
 
-S = 4 # states
+S = 2 # states
 T = 2000# Time samples
 M = 2 # microphones
 N = M # sources
@@ -14,10 +14,10 @@ for n in range(N):
     HMMs.append(HMM(S,T))
     
 
-mean1=1
-stddev1=1
+mean1=2
+stddev1=4
 mean2=0
-stddev2=0.5
+stddev2=1
 
 y=np.zeros((N,T))
 for t in range(T):
@@ -38,9 +38,9 @@ for it in range(iterations):
 
     print "-------------------"
     print G
-    print HMMs[0].mu_state
-    print HMMs[0].var_state
-    print HMMs[1].mu_state
-    print HMMs[1].var_state
+    print HMMs[0].mu_states
+    print HMMs[0].var_states
+    print HMMs[1].mu_states
+    print HMMs[1].var_states
 #print HMMs[0].gamma
 
