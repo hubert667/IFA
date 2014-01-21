@@ -52,7 +52,7 @@ def Calc_phi(hmms,t,X):
 
     return phi
 
-Eps=0.00000000001 #learning rate for the G matrix
+Eps=0.0001 #learning rate for the G matrix
 
 MIN_variance = 1e-3
 
@@ -128,6 +128,7 @@ class HMM:
         
         self._calc_gamma()
         
+        sumA=[0]*self.S
         for s in range(self.S):
             sum_gamma = np.sum(self.gamma[s])
             
@@ -140,8 +141,10 @@ class HMM:
             for s_prime in range(self.S):
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
                 self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
-
-        self.pi = self.gamma[:,0]
+                sumA[s_prime]+=self.a[s_prime,s]   
+        for s_prim in range(self.S):    
+            self.a[s_prim,:]/=sumA[s_prim]
+        self.pi = self.gamma[:,0]/sum(self.pi)
 
     def likelihood(self):
         return np.prod(self.c)

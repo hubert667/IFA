@@ -1,6 +1,12 @@
 from hmm import *
 import numpy as np
 
+
+S = 4 # states
+T = 2000# Time samples
+M = 2 # microphones
+N = M # sources
+
 G = np.random.random((N, N))  
         
 HMMs = []
@@ -20,7 +26,7 @@ for t in range(T):
 
 #so it is like using I matrix as a mixing matrix
 
-iterations=3
+iterations=10
 x=np.zeros((N,T))
 for it in range(iterations):
     for t in range(T):
