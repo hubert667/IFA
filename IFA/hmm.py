@@ -149,10 +149,7 @@ class HMM:
         self.pi = self.gamma[:,0]
 
     def likelihood(self):
-        l = 1
-        for n in range(self.T):
-            l *= self.c[n]
-        return l
+        return np.prod(self.c)
     
 
 
