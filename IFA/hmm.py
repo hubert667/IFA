@@ -45,16 +45,16 @@ def Calc_phi(hmms,t,X):
     phi = np.zeros(X.shape[0])
 
     for i in range(X.shape[0]):
-        phi[i] = np.sum(hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_state[:])/hmms[i].var_state[:])
+        phi[i] = np.sum(hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states[:])/hmms[i].var_state[:])
 
         if np.isnan(phi[i]):
-            print "phi[i]=nan", hmms[i].var_state[:], hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_state[:])
+            print "phi[i]=nan", hmms[i].var_state[:], hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states[:])
 
     return phi
 
 Eps=0.0001 #learning rate for the G matrix
 
-MIN_variance = 1e-3
+MIN_variance = 1e-30
 
 class HMM:
     def __init__(self, states, length):
