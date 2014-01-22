@@ -13,7 +13,7 @@ import scipy.stats
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
 
-    return np.random.standard_normal(1)*stddev + mean
+    return float(np.random.standard_normal(1)*stddev + mean)
 
 def gauss_prob(x,mean,var):
     """Returns probability of sampling x from the gaussian"""
@@ -118,7 +118,7 @@ class HMM:
             assert t < self.T
             assert s_prime < self.S and s < self.S
             xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
-            xi[i] *= self.c[t]
+            xi[i] /= self.c[t]
         return xi
 
     def update(self,x):
