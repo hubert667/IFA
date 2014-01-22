@@ -147,7 +147,8 @@ class HMM:
         for s_prim in range(self.S):    
             self.a[s_prim,:] /= np.sum(self.a[s_prim])
         # pi update and renormalization
-        self.pi = self.gamma[:,0] / np.sum(self.pi)
+        self.pi = self.gamma[:,0] 
+        self.pi /= np.sum(self.pi)
 
     def likelihood(self):
         return np.prod(self.c)
