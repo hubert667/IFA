@@ -8,7 +8,7 @@ Created on Mon Jan 20 15:58:25 2014
 from hmm import *
 import numpy as np
 import sys
-
+import matplotlib.pyplot as plt
 
 S = 2 # states
 T = 2000 # Time samples
@@ -23,9 +23,9 @@ x = [ Gsample(0,0.5) for i in range(T) ]
 #x = [ Gsample(0,4) for i in range(T/2) ] + [ Gsample(20,4) for i in range(T/2) ] # requires even T
 
 
-iterations = 5
+iterations = 10
 
-
+log_likelihoods = []
 for i in range(iterations):
     a.update(x)
     
@@ -37,6 +37,9 @@ for i in range(iterations):
     print "var", a.var_states
 #    print "a", a.a
     print a.log_likelihood(), np.min(a.c)
+    log_likelihoods.append(a.log_likelihood())
     
+
+plt.plot(log_likelihoods)
     
 
