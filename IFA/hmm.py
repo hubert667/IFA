@@ -8,7 +8,7 @@ Created on Tue Jan 14 02:25:10 2014
 import numpy as np
 #import math as mt
 import scipy.stats
-
+import sys
 
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
@@ -110,9 +110,20 @@ class HMM:
         self.gamma = np.multiply(self.alpha, self.beta)
         
     def xi(self, x, s_prime, s, t_):
+#         assert np.prod(t>0)
+#         t = np.array(t)
+#         print t
+#         print t.shape, self.alpha[s_prime,t-1].shape, self.beta[s,t].shape, gauss_prob(x[t], self.mu_states[s], self.var_states[s]).shape, self.alpha[s_prime, s].shape
+#         sys.exit(1)
+#         xi = np.multiply(np.multiply(self.alpha[s_prime,t-1],self.beta[s,t]).reshape((t.size,1)), gauss_prob(x[t],self.mu_states[s],self.var_states[s]).reshape((t.size,1)))  #np.multiply(np.multiply(self.alpha[s_prime,t-1],self.beta[s,t]),gauss_prob(x[t],self.mu_states[s],self.var_states[s]))*self.a[s_prime,s]
+#         xi /= self.c[t]
+         
+        # print xi
+#         return xi
+         
         t_ = np.array(t_)
         xi = np.zeros(t_.size)
-        for i in range(len(t_)):
+        for i in range(t_.size):
             t = t_[i]
             assert t>0
             assert t < self.T
@@ -129,7 +140,7 @@ class HMM:
         
         self._calc_gamma()
         
-        
+        xi_time = np.arange(1,self.T)
         for s in range(self.S):
             sum_gamma = np.sum(self.gamma[s])
             
@@ -141,14 +152,22 @@ class HMM:
             
             for s_prime in range(self.S):
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
-                self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
+                #self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
+                
+                self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, xi_time))
+                
         
-        # A's renormalization        
-        for s_prim in range(self.S):    
-            self.a[s_prim,:] /= np.sum(self.a[s_prim])
-        # pi update and renormalization
-        self.pi = self.gamma[:,0] 
-        self.pi /= np.sum(self.pi)
+        # A's renormalization       
+        for s_prime in range(self.S):    
+        #    self.a[s_prim,:] /= np.sum(self.a[s_prim])
+            a_denominator = 0.
+            for s_prime_prime in range(self.S):
+                    a_denominator += np.sum(self.xi(x, s_prime, s_prime_prime, xi_time))
+            self.a[s_prime] /= a_denominator
+        
+        self.pi = self.gamma[:,0] / np.sum(self.gamma[:,0])
+        
+        
 
     def likelihood(self):
         return np.prod(self.c)
