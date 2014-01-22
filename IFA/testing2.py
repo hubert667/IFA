@@ -10,7 +10,7 @@ import numpy as np
 import sys
 
 
-S = 3 # states
+S = 1 # states
 T = 2000 # Time samples
 M = 2 # microphones
 N = M # sources
@@ -19,21 +19,24 @@ N = M # sources
 #Y =  np.ones((M,T))
 
 a = HMM(S,T)
-x = [ Gsample(20,0.5) for i in range(T) ]
+x = [ Gsample(50,0.5) for i in range(T) ]
 #x = [ Gsample(0,4) for i in range(T/2) ] + [ Gsample(20,4) for i in range(T/2) ] # requires even T
 
 
-iterations = 10
+iterations = 3
 
 
 for i in range(iterations):
     a.update(x)
+    
     print "------------------"
-    print "alpha", a.alpha
-    print "beta", a.beta
-    print "gamma", a.gamma
+#    print "alpha", a.alpha
+#    print "beta", a.beta
+#    print "gamma", a.gamma
     print "mu", a.mu_states
     print "var", a.var_states
-    print "a", a.a
+#    print "a", a.a
+    print a.log_likelihood(), np.min(a.c)
+    
     
 

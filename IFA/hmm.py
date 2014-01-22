@@ -63,11 +63,11 @@ class HMM:
         self.T = length
         
         # store the states of each node
-        self.states = np.zeros(length,dtype=int)        
+        #self.states = np.zeros(length,dtype=int)        
         
         # store mu and var for each state
         self.mu_states  = np.random.randn(states)
-        self.var_states = np.random.gamma(1,1,states)    
+        self.var_states = np.random.gamma(1,10,states)    
         
         self.alpha = np.empty((states, length))        
         self.beta  = np.ones((states, length))
@@ -151,3 +151,6 @@ class HMM:
 
     def likelihood(self):
         return np.prod(self.c)
+        #return np.exp(np.sum(np.log(self.c)))
+    def log_likelihood(self):
+        return np.sum(np.log(self.c))
