@@ -92,7 +92,7 @@ class HMM:
       
     def _calc_alphas(self,x):
         # t=1 (t = 0)
-        self.alpha[:,0] = np.multiply(self.pi, gauss_prob(x[0], self.mu_states, self.var_states))
+        self.alpha[:,0] = self.pi * gauss_prob(x[0], self.mu_states, self.var_states)
         
         self.c[0] = np.sum(self.alpha[:,0])
         self.alpha[:,0] /= self.c[0]
@@ -113,22 +113,22 @@ class HMM:
         # t = 1,...,T-1 (t = 0,...,T-2)
         for t in range(self.T-2, -1, -1):
             for s in self.s_range:
-                self.beta[s,t] = np.dot(self.beta[:,t+1], np.multiply(gauss_prob(x[t+1], self.mu_states, self.var_states), self.a[s,:]))
+                self.beta[s,t] = np.dot(self.beta[:,t+1], gauss_prob(x[t+1], self.mu_states, self.var_states) * self.a[s,:])
             self.beta[:,t] /= self.c[t+1]
                 
     def _calc_gamma(self):
-        self.gamma = np.multiply(self.alpha, self.beta)
+        self.gamma = self.alpha * self.beta
         
     def _calc_xi(self, x):
         for s in self.s_range:        
             for s_prime in self.s_range:
-                self.xi_sum_t[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) # the same as the unnormalized a_s's
+                # the sum of xi_s's is the same as the unnormalized a_s's
+                self.xi_sum_t[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) 
     
     def xi(self, x, s_prime, s, t):
         """ IMPORTANT!: t>0 """           
-        xi = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
-        xi /= self.c[t]
-        return xi
+        return self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s] / self.c[t]
+        
 
     def update(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
@@ -150,6 +150,7 @@ class HMM:
             
             self.var_states[s]= np.dot(self.gamma[s], np.power(x-self.mu_states[s],2)) / sum_gamma
                
+        # the sum of xi_s's is the same as the unnormalized a_s's
         self.a = self.xi_sum_t
         for s_prime in self.s_range:    
             self.a[s_prime] /= np.sum(self.a[s_prime])
