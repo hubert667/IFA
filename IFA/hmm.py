@@ -88,7 +88,9 @@ class HMM:
         
         self.a = np.ones((states,states)) / states # rows: s', cols: s
       
-           
+        self.xi_sum_t = np.empty((states,states), dtype=float)      
+      
+        self.s_range = np.arange(self.S)
       
     def _calc_alphas(self,x):
         # t=1 (t = 0)
@@ -99,7 +101,7 @@ class HMM:
         
         # t=2,...,T (t = 1,...,T-1)
         for t in range(1, self.T):
-            for s in range(self.S):
+            for s in self.s_range:
                 x_prob = gauss_prob(x[t], self.mu_states[s], self.var_states[s])
                 self.alpha[s,t] = x_prob * np.dot(self.alpha[:,t-1], self.a[:,s])
                 
@@ -112,13 +114,18 @@ class HMM:
         
         # t = 1,...,T-1 (t = 0,...,T-2)
         for t in range(self.T-2, -1, -1):
-            for s in range(self.S):
+            for s in self.s_range:
                 self.beta[s,t] = np.dot(self.beta[:,t+1], np.multiply(gauss_prob(x[t+1], self.mu_states, self.var_states), self.a[s,:]))
             self.beta[:,t] /= self.c[t+1]
                 
     def _calc_gamma(self):
         self.gamma = np.multiply(self.alpha, self.beta)
         
+    def _calc_xi(self, x):
+        for s in self.s_range:        
+            for s_prime in self.s_range:
+                self.xi_sum_t[s_prime,s] = np.sum(self.xi_array(x, s_prime, s)) # the same as the unnormalized a_s's
+    
     def xi(self, x, s_prime, s, t):
         """ IMPORTANT!: t>0 """           
         xi = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
@@ -139,6 +146,7 @@ class HMM:
         self._calc_betas(x)
         
         self._calc_gamma()
+        self._calc_xi(x)
         
         
         s_range = np.arange(self.S)
@@ -149,29 +157,16 @@ class HMM:
             self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma
             
             self.var_states[s]= np.dot(self.gamma[s], (x-self.mu_states[s])**2) / sum_gamma
+        
             # Let's update the variance but with a minimum threshold
             #self.var_states = np.maximum(self.var_states, MIN_variance)            
-            
-            for s_prime in s_range:
-                #should for t-1 so from 0 to T-1 for denominator?????????? 
-                #self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
-                
-                
-                self.a[s_prime,s] = np.sum(self.xi_array(x, s_prime, s))
-                
-                
-                den = 0
-                for s_prime_prime in s_range:
-                    if s_prime_prime == s:
-                        print "=====", self.a[s_prime,s], np.sum(self.xi_array(x, s_prime, s_prime_prime))
-                    den += np.sum(self.xi_array(x, s_prime, s_prime_prime))
-                self.a[s_prime,s] /= den
+               
         
-        # A's renormalization       
-        for s_prime in range(self.S):    
-            #self.a[s_prime] /= np.sum(self.a[s_prime])
+        # A's renormalization  
+        self.a = self.xi_sum_t
+        for s_prime in s_range:    
+            self.a[s_prime] /= np.sum(self.a[s_prime])
             pass
-        
         
         self.pi = self.gamma[:,0] / np.sum(self.gamma[:,0])
         
@@ -204,7 +199,7 @@ class HMM:
 import sys
 import matplotlib.pyplot as plt
 
-S = 2 # states
+S = 1 # states
 T = 2000 # Time samples
 M = 2 # microphones
 N = M # sources
@@ -215,7 +210,7 @@ N = M # sources
 mu_init = np.array([0,10])
 var_init = np.array([2,10])
 
-a = HMM(S,T, mu_init, var_init)
+a = HMM(S,T)#, mu_init, var_init)
 #x = np.array([ Gsample(0,5) for i in range(T) ])
 #x = [ Gsample(0,4) for i in range(T/2) ] + [ Gsample(20,4) for i in range(T/2) ] # requires even T
 
