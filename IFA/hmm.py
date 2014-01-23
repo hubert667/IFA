@@ -118,30 +118,10 @@ class HMM:
         self.gamma = np.multiply(self.alpha, self.beta)
         
     def xi(self, x, s_prime, s, t):
-        
- 
-        assert np.prod(t>0)
-  
-        #xi = np.multiply(np.multiply(self.alpha[s_prime,t-1],self.beta[s,t]).reshape((t.size,1)), gauss_prob(x[t],self.mu_states[s],self.var_states[s]).reshape((t.size,1)))  #np.multiply(np.multiply(self.alpha[s_prime,t-1],self.beta[s,t]),gauss_prob(x[t],self.mu_states[s],self.var_states[s]))*self.a[s_prime,s]
-        #xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
-       # xi /= self.c[t]
-         
-        # print xi
-#         return xi
-         
-        t_ = np.array(t)
-        xi = np.zeros(t_.size)
-        for i in range(t_.size):
-            t = t_[i]
-            assert t>0
-            assert t < self.T
-            assert s_prime < self.S and s < self.S
-            xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
-            xi[i] /= self.c[t]
+        """ IMPORTANT!: t>0 """           
+        xi = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
+        xi /= self.c[t]
         return xi
-
-    def xi_all_t(self, x, s_prime, s):
-        pass
 
     def update(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
