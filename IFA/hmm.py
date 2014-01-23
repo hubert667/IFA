@@ -144,11 +144,11 @@ class HMM:
         # M-step        
         
         for s in self.s_range:
-            sum_gamma = np.sum(self.gamma[s])
+            sum_gamma_s = np.sum(self.gamma[s])
             
-            self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma
+            self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma_s
             
-            self.var_states[s]= np.dot(self.gamma[s], np.power(x-self.mu_states[s],2)) / sum_gamma
+            self.var_states[s]= np.dot(self.gamma[s], np.power(x-self.mu_states[s],2)) / sum_gamma_s
                
         # the sum of xi_s's is the same as the unnormalized a_s's
         self.a = self.xi_sum_t
