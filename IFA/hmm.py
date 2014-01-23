@@ -58,7 +58,7 @@ Eps=0.1 #learning rate for the G matrix
 MIN_variance = 1e-30
 
 class HMM:
-    def __init__(self, states, length):
+    def __init__(self, states, length, mu_init=None, var_init=None):
         self.S   = states
         self.T = length
         
@@ -68,6 +68,14 @@ class HMM:
         # store mu and var for each state
         self.mu_states  = np.random.randn(states)#; self.mu_states[:] = 0; self.mu_states[1] = 20.
         self.var_states = np.random.gamma(1,10,states)#   ; self.var_states[:]  = .5
+        
+        if mu_init!=None:
+            self.mu_states = mu_init
+        if var_init!=None:
+            self.var_states = var_init
+            
+        if mu_init!=None and var_init!=None:
+            print "Overriding random initialization..."
         
         self.alpha = np.empty((states, length))        
         self.beta  = np.ones((states, length))
@@ -109,29 +117,31 @@ class HMM:
     def _calc_gamma(self):
         self.gamma = np.multiply(self.alpha, self.beta)
         
-    def xi(self, x, s_prime, s, t_):
-#         assert np.prod(t>0)
-#         t = np.array(t)
-#         print t
-        t = t_
-#        print t.shape, self.alpha[s_prime,t-1].shape, self.beta[s,t].shape, gauss_prob(x[t], self.mu_states[s], self.var_states[s]).shape, self.alpha[s_prime, s].shape
-#         sys.exit(1)
-#         xi = np.multiply(np.multiply(self.alpha[s_prime,t-1],self.beta[s,t]).reshape((t.size,1)), gauss_prob(x[t],self.mu_states[s],self.var_states[s]).reshape((t.size,1)))  #np.multiply(np.multiply(self.alpha[s_prime,t-1],self.beta[s,t]),gauss_prob(x[t],self.mu_states[s],self.var_states[s]))*self.a[s_prime,s]
-#         xi /= self.c[t]
+    def xi(self, x, s_prime, s, t):
+        
+ 
+        assert np.prod(t>0)
+  
+        #xi = np.multiply(np.multiply(self.alpha[s_prime,t-1],self.beta[s,t]).reshape((t.size,1)), gauss_prob(x[t],self.mu_states[s],self.var_states[s]).reshape((t.size,1)))  #np.multiply(np.multiply(self.alpha[s_prime,t-1],self.beta[s,t]),gauss_prob(x[t],self.mu_states[s],self.var_states[s]))*self.a[s_prime,s]
+        #xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
+       # xi /= self.c[t]
          
         # print xi
 #         return xi
          
-        t_ = np.array(t_)
+        t_ = np.array(t)
         xi = np.zeros(t_.size)
         for i in range(t_.size):
             t = t_[i]
             assert t>0
             assert t < self.T
             assert s_prime < self.S and s < self.S
-            xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.alpha[s_prime,s]
+            xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
             xi[i] /= self.c[t]
         return xi
+
+    def xi_all_t(self, x, s_prime, s):
+        pass
 
     def update(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
@@ -186,3 +196,63 @@ class HMM:
         
     def log_likelihood(self):
         return np.sum(np.log(self.c))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import sys
+import matplotlib.pyplot as plt
+
+S = 2 # states
+T = 2000 # Time samples
+M = 2 # microphones
+N = M # sources
+
+
+#Y =  np.ones((M,T))
+
+mu_init = np.array([0,10])
+var_init = np.array([2,10])
+
+a = HMM(S,T, mu_init, var_init)
+#x = np.array([ Gsample(0,5) for i in range(T) ])
+#x = [ Gsample(0,4) for i in range(T/2) ] + [ Gsample(20,4) for i in range(T/2) ] # requires even T
+
+
+iterations = 10
+
+log_likelihoods = []
+for i in range(iterations):
+    a.update(x)
+    
+    print "------------------"
+#    print "alpha", a.alpha
+#    print "beta", a.beta
+#    print "gamma", a.gamma
+    print "mu", a.mu_states
+    print "var", a.var_states
+#    print "a", a.a
+    for s_prime in range(a.S):
+        print np.sum(a.a[s_prime])
+    print a.log_likelihood(), np.min(a.c)
+    log_likelihoods.append(a.log_likelihood())
+    
+
+plt.plot(log_likelihoods)
+    
+
