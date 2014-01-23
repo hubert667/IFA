@@ -113,7 +113,8 @@ class HMM:
 #         assert np.prod(t>0)
 #         t = np.array(t)
 #         print t
-#         print t.shape, self.alpha[s_prime,t-1].shape, self.beta[s,t].shape, gauss_prob(x[t], self.mu_states[s], self.var_states[s]).shape, self.alpha[s_prime, s].shape
+        t = t_
+#        print t.shape, self.alpha[s_prime,t-1].shape, self.beta[s,t].shape, gauss_prob(x[t], self.mu_states[s], self.var_states[s]).shape, self.alpha[s_prime, s].shape
 #         sys.exit(1)
 #         xi = np.multiply(np.multiply(self.alpha[s_prime,t-1],self.beta[s,t]).reshape((t.size,1)), gauss_prob(x[t],self.mu_states[s],self.var_states[s]).reshape((t.size,1)))  #np.multiply(np.multiply(self.alpha[s_prime,t-1],self.beta[s,t]),gauss_prob(x[t],self.mu_states[s],self.var_states[s]))*self.a[s_prime,s]
 #         xi /= self.c[t]
@@ -128,7 +129,7 @@ class HMM:
             assert t>0
             assert t < self.T
             assert s_prime < self.S and s < self.S
-            xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
+            xi[i] = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.alpha[s_prime,s]
             xi[i] /= self.c[t]
         return xi
 
@@ -141,7 +142,9 @@ class HMM:
         self._calc_gamma()
         
         xi_time = np.arange(1,self.T)
-        for s in range(self.S):
+        s_range = np.arange(self.S)
+        
+        for s in s_range:
             sum_gamma = np.sum(self.gamma[s])
             
             self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma
@@ -150,20 +153,29 @@ class HMM:
             # Let's update the variance but with a minimum threshold
             self.var_states = np.maximum(self.var_states, MIN_variance)            
             
-            for s_prime in range(self.S):
+            for s_prime in s_range:
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
                 #self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
                 
                 self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, xi_time))
                 
+                #den = 0
+                #for s_prime_prime in s_range:
+                    #if s_prime_prime == s:
+                    #    print "=====", self.a[s_prime,s], np.sum(self.xi(x, s_prime, s_prime_prime, xi_time))
+                 #   den += np.sum(self.xi(x, s_prime, s_prime_prime, xi_time))
+                #self.a[s_prime,s] /= den
         
         # A's renormalization       
         for s_prime in range(self.S):    
         #    self.a[s_prim,:] /= np.sum(self.a[s_prim])
-            a_denominator = 0.
-            for s_prime_prime in range(self.S):
-                    a_denominator += np.sum(self.xi(x, s_prime, s_prime_prime, xi_time))
-            self.a[s_prime] /= a_denominator
+            #a_denominator = 0.
+            #for s_prime_prime in range(self.S):
+            #        a_denominator += np.sum(self.xi(x, s_prime, s_prime_prime, xi_time))
+            #self.a[s_prime] /= a_denominator
+            self.a[s_prime] /= np.sum(self.a[s_prime])
+            pass
+        
         
         self.pi = self.gamma[:,0] / np.sum(self.gamma[:,0])
         
@@ -171,6 +183,6 @@ class HMM:
 
     def likelihood(self):
         return np.prod(self.c)
-        #return np.exp(np.sum(np.log(self.c)))
+        
     def log_likelihood(self):
         return np.sum(np.log(self.c))

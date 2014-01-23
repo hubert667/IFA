@@ -19,7 +19,7 @@ N = M # sources
 #Y =  np.ones((M,T))
 
 a = HMM(S,T)
-x = [ Gsample(0,0.5) for i in range(T) ]
+x = [ Gsample(0,5) for i in range(T) ]
 #x = [ Gsample(0,4) for i in range(T/2) ] + [ Gsample(20,4) for i in range(T/2) ] # requires even T
 
 
@@ -36,6 +36,8 @@ for i in range(iterations):
     print "mu", a.mu_states
     print "var", a.var_states
 #    print "a", a.a
+    for s_prime in range(a.S):
+        print np.sum(a.a[s_prime])
     print a.log_likelihood(), np.min(a.c)
     log_likelihoods.append(a.log_likelihood())
     
