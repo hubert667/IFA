@@ -198,8 +198,8 @@ mu_init = np.array([0,10.])
 var_init = np.array([2,10.])
 
 a = HMM(S,T, mu_init, var_init)
-#x = np.array([ Gsample(0,5) for i in range(T) ])
-#x = [ Gsample(0,4) for i in range(T/2) ] + [ Gsample(20,4) for i in range(T/2) ] # requires even T
+x = np.array([ Gsample(0,5) for i in range(T) ])
+#x = np.array([ Gsample(0,4) for i in range(T/2) ] + [ Gsample(20,4) for i in range(T/2) ]) # requires even T
 
 
 iterations = 10
