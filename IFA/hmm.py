@@ -133,11 +133,15 @@ class HMM:
     def update(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
         
+        # E-step
+        
         self._calc_alphas(x)
         self._calc_betas(x)
         
         self._calc_gamma()
         self._calc_xi(x)
+        
+        # M-step        
         
         for s in self.s_range:
             sum_gamma = np.sum(self.gamma[s])
@@ -146,8 +150,6 @@ class HMM:
             
             self.var_states[s]= np.dot(self.gamma[s], np.power(x-self.mu_states[s],2)) / sum_gamma
                
-        
-        # A's renormalization  
         self.a = self.xi_sum_t
         for s_prime in self.s_range:    
             self.a[s_prime] /= np.sum(self.a[s_prime])
