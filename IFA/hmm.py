@@ -80,8 +80,6 @@ class HMM:
         self.alpha = np.empty((states, length))        
         self.beta  = np.ones((states, length))
         
-        #self.beta[:, self.T-1] /= states # we assume beta should still be 1 even when rescaled - right or wrong?
-        
         self.c = np.empty(length)
         
         self.pi = np.ones(states)  / states # uniform prior   
@@ -124,17 +122,10 @@ class HMM:
     def _calc_xi(self, x):
         for s in self.s_range:        
             for s_prime in self.s_range:
-                self.xi_sum_t[s_prime,s] = np.sum(self.xi_array(x, s_prime, s)) # the same as the unnormalized a_s's
+                self.xi_sum_t[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) # the same as the unnormalized a_s's
     
     def xi(self, x, s_prime, s, t):
         """ IMPORTANT!: t>0 """           
-        xi = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
-        xi /= self.c[t]
-        return xi
-    
-    def xi_array(self, x, s_prime, s):
-        """ Same as xi but returns an array for all the possible values of t (0<t<=T) for xi. """
-        t = np.arange(1,self.T)
         xi = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
         xi /= self.c[t]
         return xi
@@ -148,25 +139,18 @@ class HMM:
         self._calc_gamma()
         self._calc_xi(x)
         
-        
-        s_range = np.arange(self.S)
-        
-        for s in s_range:
+        for s in self.s_range:
             sum_gamma = np.sum(self.gamma[s])
             
             self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma
             
-            self.var_states[s]= np.dot(self.gamma[s], (x-self.mu_states[s])**2) / sum_gamma
-        
-            # Let's update the variance but with a minimum threshold
-            #self.var_states = np.maximum(self.var_states, MIN_variance)            
+            self.var_states[s]= np.dot(self.gamma[s], np.power(x-self.mu_states[s],2)) / sum_gamma
                
         
         # A's renormalization  
         self.a = self.xi_sum_t
-        for s_prime in s_range:    
+        for s_prime in self.s_range:    
             self.a[s_prime] /= np.sum(self.a[s_prime])
-            pass
         
         self.pi = self.gamma[:,0] / np.sum(self.gamma[:,0])
         
@@ -199,7 +183,7 @@ class HMM:
 import sys
 import matplotlib.pyplot as plt
 
-S = 1 # states
+S = 2 # states
 T = 2000 # Time samples
 M = 2 # microphones
 N = M # sources
@@ -207,10 +191,10 @@ N = M # sources
 
 #Y =  np.ones((M,T))
 
-mu_init = np.array([0,10])
-var_init = np.array([2,10])
+mu_init = np.array([0,10.])
+var_init = np.array([2,10.])
 
-a = HMM(S,T)#, mu_init, var_init)
+a = HMM(S,T, mu_init, var_init)
 #x = np.array([ Gsample(0,5) for i in range(T) ])
 #x = [ Gsample(0,4) for i in range(T/2) ] + [ Gsample(20,4) for i in range(T/2) ] # requires even T
 
