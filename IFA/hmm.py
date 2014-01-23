@@ -140,7 +140,7 @@ class HMM:
         
         self._calc_gamma()
         
-        xi_time = np.arange(1,self.T)
+        
         s_range = np.arange(self.S)
         
         for s in s_range:
@@ -150,7 +150,7 @@ class HMM:
             
             self.var_states[s]= np.dot(self.gamma[s], (x-self.mu_states[s])**2) / sum_gamma
             # Let's update the variance but with a minimum threshold
-            self.var_states = np.maximum(self.var_states, MIN_variance)            
+            #self.var_states = np.maximum(self.var_states, MIN_variance)            
             
             for s_prime in s_range:
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
@@ -169,11 +169,6 @@ class HMM:
         
         # A's renormalization       
         for s_prime in range(self.S):    
-        #    self.a[s_prim,:] /= np.sum(self.a[s_prim])
-            #a_denominator = 0.
-            #for s_prime_prime in range(self.S):
-            #        a_denominator += np.sum(self.xi(x, s_prime, s_prime_prime, xi_time))
-            #self.a[s_prime] /= a_denominator
             #self.a[s_prime] /= np.sum(self.a[s_prime])
             pass
         
