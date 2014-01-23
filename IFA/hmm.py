@@ -88,6 +88,8 @@ class HMM:
         
         self.a = np.ones((states,states)) / states # rows: s', cols: s
       
+           
+      
     def _calc_alphas(self,x):
         # t=1 (t = 0)
         self.alpha[:,0] = np.multiply(self.pi, gauss_prob(x[0], self.mu_states, self.var_states))
@@ -122,6 +124,13 @@ class HMM:
         xi = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
         xi /= self.c[t]
         return xi
+    
+    def xi_array(self, x, s_prime, s):
+        """ Same as xi but returns an array for all the possible values of t (0<t<=T) for xi. """
+        t = np.arange(1,self.T)
+        xi = self.alpha[s_prime,t-1]*self.beta[s,t]*gauss_prob(x[t],self.mu_states[s],self.var_states[s])*self.a[s_prime,s]
+        xi /= self.c[t]
+        return xi
 
     def update(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
@@ -147,14 +156,16 @@ class HMM:
                 #should for t-1 so from 0 to T-1 for denominator?????????? 
                 #self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, np.arange(1,self.T))) / np.sum(self.gamma[s_prime, np.arange(self.T-1)])
                 
-                self.a[s_prime,s] = np.sum(self.xi(x, s_prime, s, xi_time))
                 
-                #den = 0
-                #for s_prime_prime in s_range:
-                    #if s_prime_prime == s:
-                    #    print "=====", self.a[s_prime,s], np.sum(self.xi(x, s_prime, s_prime_prime, xi_time))
-                 #   den += np.sum(self.xi(x, s_prime, s_prime_prime, xi_time))
-                #self.a[s_prime,s] /= den
+                self.a[s_prime,s] = np.sum(self.xi_array(x, s_prime, s))
+                
+                
+                den = 0
+                for s_prime_prime in s_range:
+                    if s_prime_prime == s:
+                        print "=====", self.a[s_prime,s], np.sum(self.xi_array(x, s_prime, s_prime_prime))
+                    den += np.sum(self.xi_array(x, s_prime, s_prime_prime))
+                self.a[s_prime,s] /= den
         
         # A's renormalization       
         for s_prime in range(self.S):    
@@ -163,7 +174,7 @@ class HMM:
             #for s_prime_prime in range(self.S):
             #        a_denominator += np.sum(self.xi(x, s_prime, s_prime_prime, xi_time))
             #self.a[s_prime] /= a_denominator
-            self.a[s_prime] /= np.sum(self.a[s_prime])
+            #self.a[s_prime] /= np.sum(self.a[s_prime])
             pass
         
         
