@@ -11,7 +11,7 @@ import numpy as np
 import scipy.stats
 import sys
 
-lol = 22
+
 
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
@@ -30,13 +30,6 @@ def logsumexp(a):
 
 def e(s=1):
     sys.exit(s)
-
-def p(a):
-    print a
-    e(0)
-    
-def W():
-    return raw_input()
 
 class HMM:
     def __init__(self, states, length, mu_init=None, var_init=None):
@@ -62,7 +55,7 @@ class HMM:
         
         self.pi = np.ones(self.S)  / self.S # uniform prior   
         
-        self.T = np.ones((self.S,self.S)) / self.S # rows: s', cols: s
+        self.A = np.ones((self.S,self.S)) / self.S # rows: s', cols: s
       
         self.xi_sum_t = np.empty((self.S,self.S), dtype=float)      
       
@@ -72,15 +65,10 @@ class HMM:
         # t=1 (t = 0)
         self.log_alpha[:,0] = np.log(self.pi) + np.log( gauss_prob(x[0], self.mu_states, self.var_states) )
         
-            
-        
-        
-        #p(self.log_alpha[:,0])
-        
         # t=2,...,T (t = 1,...,T-1)
         for t in range(1, self.T):
             for s in self.s_range:
-                self.log_alpha[s,t] = np.log(gauss_prob(x[t],self.mu_states[s],self.var_states[s])) + logsumexp(self.log_alpha[:,t-1] + np.log(self.T[:,s]))
+                self.log_alpha[s,t] = np.log(gauss_prob(x[t],self.mu_states[s],self.var_states[s])) + logsumexp(self.log_alpha[:,t-1] + np.log(self.A[:,s]))
         
                 
     def _calc_betas(self,x):
@@ -90,7 +78,7 @@ class HMM:
         # t = 1,...,T-1 (t = 0,...,T-2)
         for t in range(self.T-2, -1, -1):
             for s in self.s_range:
-                self.log_beta[s,t] = logsumexp(self.log_beta[:,t+1] + np.log(gauss_prob(x[t+1],self.mu_states,self.var_states)) + np.log(self.T[s]))
+                self.log_beta[s,t] = logsumexp(self.log_beta[:,t+1] + np.log(gauss_prob(x[t+1],self.mu_states,self.var_states)) + np.log(self.A[s]))
             
             
         
@@ -102,11 +90,11 @@ class HMM:
         for s in self.s_range:        
             for s_prime in self.s_range:
                 # the sum of xi_s's is the same as the unnormalized a_s's
-                self.xi_sum_t[s_prime,s] = np.sum(np.exp(self.log_xi(x, s_prime, s, np.arange(1,self.T))))
+                self.xi_sum_t[s_prime,s] = np.exp(logsumexp(self.log_xi(x, s_prime, s, np.arange(1,self.T))))
     
     def log_xi(self, x, s_prime, s, t):
         """ IMPORTANT!: t>0 """           
-        return self.log_alpha[s_prime,t-1] + self.log_beta[s,t] + np.log(gauss_prob(x[t],self.mu_states[s],self.var_states[s])) + np.log(self.T[s_prime,s])
+        return self.log_alpha[s_prime,t-1] + self.log_beta[s,t] + np.log(gauss_prob(x[t],self.mu_states[s],self.var_states[s])) + np.log(self.A[s_prime,s])
         
 
     def update(self,x):
@@ -124,15 +112,15 @@ class HMM:
         
         for s in self.s_range:
             sum_gamma_s = np.sum(np.exp(self.log_gamma[s])) # with np.exp(logsumexp(self.log_gamma[s])) doesn't work either
-            
+            print "IT IS 0!!! ", sum_gamma_s
             self.mu_states[s] = np.dot(np.exp(self.log_gamma[s]), x) / sum_gamma_s
             
             self.var_states[s]= np.dot(np.exp(self.log_gamma[s]), np.power(x-self.mu_states[s],2)) / sum_gamma_s
                
         # the sum of xi_s's is the same as the unnormalized a_s's
-        self.T = np.copy(self.xi_sum_t) # depending on the situation / upgrade to the final algorithm, copy may be avoided
+        self.A = np.copy(self.xi_sum_t) # depending on the situation / upgrade to the final algorithm, copy may be avoided
         for s_prime in self.s_range:    
-            self.T[s_prime] /= np.sum(self.T[s_prime])
+            self.A[s_prime] /= np.sum(self.A[s_prime])
             
         
         self.pi = np.exp(self.log_gamma[:,0]) / np.sum(np.exp(self.log_gamma[:,0]))
@@ -221,7 +209,7 @@ x = np.array([ Gsample(0,5) for i in range(T) ])
 
 iterations = 20
 
-print "lol", lol
+
 
 log_likelihoods = []
 for i in range(iterations):
@@ -233,7 +221,7 @@ for i in range(iterations):
 #    print "gamma", a.gamma
     print "mu", a.mu_states
     print "var", a.var_states
-    print "p(s)", np.sum(a.a, axis=0)/np.sum(a.a)
+    print "p(s)", np.sum(a.A, axis=0)/np.sum(a.A)
 #    print "a", a.a
 #    print "a normalization", np.sum(a.a, axis=1)
     print "log-likelihood =", a.log_likelihood()
