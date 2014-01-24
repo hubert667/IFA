@@ -162,7 +162,27 @@ class HMM:
         return np.sum(np.log(self.c))
 
 
+def GSeqSample(T, persistence, w, mu, var):
+    """ Generates T samples from a set of gaussians with probabilities w and parameters (mu,var). 
+        Persistence is the probability of sampling the next sample from the same state. """
+    w = np.asarray(w)    
+    w /= np.sum(w) # to normalize, just in case
 
+    x = []
+    i = 0
+    u_sample = np.random.rand(1)
+    while i < T:
+        if persistence > np.random.rand(1):
+            u_sample = u_sample
+        else:
+            u_sample = np.random.rand(1)
+        for g in range(len(w)):
+            g_max = w[g]
+            if u_sample < g_max:
+                x.append(Gsample(mu[g],var[g]))
+                i += 1
+                break
+    return np.array(x)
 
 
 
@@ -182,8 +202,8 @@ class HMM:
 import sys
 import matplotlib.pyplot as plt
 
-S = 1 # states
-T = 1000 # Time samples
+S = 4 # states
+T = 100 # Time samples
 M = 2 # microphones
 N = M # sources
 
@@ -195,8 +215,17 @@ N = M # sources
 
 a = HMM(S,T)#, mu_init, var_init)
 x = np.array([ Gsample(0,5) for i in range(T) ])
-#x = np.array([ Gsample(0,3) for i in range(T/2) ] + [ Gsample(50,4) for i in range(T/2) ]) # requires even T
 
+
+
+
+# probabilities of selecting each gaussian
+w = [0.4, 0.4] 
+mu_w = [0., 23.]
+var_w = [2.2, 4.]
+
+x = np.array([ Gsample(0,3) for i in range(T/2) ] + [ Gsample(50,4) for i in range(T/2) ]) # requires even T
+#x = GSeqSample(T, 0.1, w, mu_w, var_w)
 
 iterations = 20
 
@@ -210,13 +239,15 @@ for i in range(iterations):
 #    print "gamma", a.gamma
     print "mu", a.mu_states
     print "var", a.var_states
+    print "p(s)", np.sum(a.a, axis=0)/np.sum(a.a)
 #    print "a", a.a
-    for s_prime in range(a.S):
-        print np.sum(a.a[s_prime])
-    print a.log_likelihood(), np.min(a.c)
+    print "a normalization", np.sum(a.a, axis=1)
+    print "log-likelihood =", a.log_likelihood()
     log_likelihoods.append(a.log_likelihood())
     
 
 plt.plot(log_likelihoods)
+plt.xlabel("Iterations")
+plt.ylabel("Log-likelihood")
     
 
