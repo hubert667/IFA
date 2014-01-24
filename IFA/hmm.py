@@ -13,7 +13,8 @@ import sys
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
 
-    return float(np.random.standard_normal(1)*stddev + mean)
+    #return float(np.random.standard_normal(1)*stddev + mean)
+    return np.random.standard_normal(1)*stddev + mean
 
 def gauss_prob(x,mean,var):
     """Returns probability of sampling x from the gaussian"""
@@ -162,29 +163,40 @@ class HMM:
         return np.sum(np.log(self.c))
 
 
+def discretePDF2CDF(w):
+    for i in range(1,w.size):
+        w[i] += w[i-1]
+    return w/w[-1] # normalizes in case the input wasn't
+
+def e(s=1):
+    sys.exit(s)
+
+def discreteInvCDF(CDF,x):
+    " Returns the class of the CDF to which x belongs. "
+    for i in range(CDF.size):
+        if x < CDF[i]:
+            return i
+
 def GSeqSample(T, persistence, w, mu, var):
     """ Generates T samples from a set of gaussians with probabilities w and parameters (mu,var). 
         Persistence is the probability of sampling the next sample from the same state. """
-    w = np.asarray(w)    
-    w /= np.sum(w) # to normalize, just in case
-
-    x = []
-    i = 0
-    u_sample = np.random.rand(1)
-    while i < T:
+    mu = np.array(mu); var = np.asarray(var)
+    
+    w = discretePDF2CDF(np.asarray(w)) # and normalizes
+    
+    # Uniform samples i.i.d. in [0,1[.
+    u_samples = np.random.rand(T) 
+    # Array that stores which gaussians get chosen.
+    g = [discreteInvCDF(w, u_samples[0])]
+    
+    for i in range(1,T):
         if persistence > np.random.rand(1):
-            u_sample = u_sample
+            g.append(g[-1]) # Mantain the state.
         else:
-            u_sample = np.random.rand(1)
-        for g in range(len(w)):
-            g_max = w[g]
-            if u_sample < g_max:
-                x.append(Gsample(mu[g],var[g]))
-                i += 1
-                break
-    return np.array(x)
-
-
+            g.append(discreteInvCDF(w, u_samples[i])) # Sample from a new normal chosen through the probabilities/weights w.
+        
+    return Gsample(mu[g], var[g])  
+    
 
 
 
@@ -202,8 +214,8 @@ def GSeqSample(T, persistence, w, mu, var):
 import sys
 import matplotlib.pyplot as plt
 
-S = 4 # states
-T = 100 # Time samples
+S = 2 # states
+T = 1000 # Time samples
 M = 2 # microphones
 N = M # sources
 
@@ -214,18 +226,19 @@ N = M # sources
 #var_init = np.array([2,10.,12])
 
 a = HMM(S,T)#, mu_init, var_init)
-x = np.array([ Gsample(0,5) for i in range(T) ])
+
 
 
 
 
 # probabilities of selecting each gaussian
-w = [0.4, 0.4] 
-mu_w = [0., 23.]
-var_w = [2.2, 4.]
+w = [.4, 0.4] 
+mu_w = [0., 50.]
+var_w = [3., 4.]
 
-x = np.array([ Gsample(0,3) for i in range(T/2) ] + [ Gsample(50,4) for i in range(T/2) ]) # requires even T
-#x = GSeqSample(T, 0.1, w, mu_w, var_w)
+#x = np.array([ Gsample(0,5) for i in range(T) ])
+x = np.asarray([ Gsample(0,3) for i in range(T/2) ] + [ Gsample(50,4) for i in range(T/2) ]) # requires even T
+#x = GSeqSample(T, .999, w, mu_w, var_w) # persistence of 0.8 creates reasonably noticeable chains when w is close to uniform
 
 iterations = 20
 
