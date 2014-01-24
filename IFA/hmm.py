@@ -55,19 +55,14 @@ def Calc_phi(hmms,t,X):
 
 Eps=0.1 #learning rate for the G matrix
 
-MIN_variance = 1e-30
-
 class HMM:
     def __init__(self, states, length, mu_init=None, var_init=None):
         self.S   = states
         self.T = length
         
-        # store the states of each node
-        #self.states = np.zeros(length,dtype=int)        
-        
         # store mu and var for each state
-        self.mu_states  = np.random.randn(states)#; self.mu_states[:] = 0; self.mu_states[1] = 20.
-        self.var_states = np.random.gamma(1,10,states)#   ; self.var_states[:]  = .5
+        self.mu_states  = np.random.randn(states)
+        self.var_states = np.random.gamma(1,10,states)
         
         if mu_init!=None:
             self.mu_states = mu_init
@@ -133,7 +128,7 @@ class HMM:
     def update(self,x):
         """Updates a,mean and variance. x contains data only for particular source"""
         
-        # E-step
+        # E-step  
         
         self._calc_alphas(x)
         self._calc_betas(x)
@@ -151,9 +146,10 @@ class HMM:
             self.var_states[s]= np.dot(self.gamma[s], np.power(x-self.mu_states[s],2)) / sum_gamma_s
                
         # the sum of xi_s's is the same as the unnormalized a_s's
-        self.a = self.xi_sum_t
-        for s_prime in self.s_range:    
+        self.a = np.copy(self.xi_sum_t) # depending on the situation / upgrade to the final algorithm, copy may be avoided
+        for s_prime     in self.s_range:    
             self.a[s_prime] /= np.sum(self.a[s_prime])
+            
         
         self.pi = self.gamma[:,0] / np.sum(self.gamma[:,0])
         
@@ -186,29 +182,29 @@ class HMM:
 import sys
 import matplotlib.pyplot as plt
 
-S = 2 # states
-T = 2000 # Time samples
+S = 1 # states
+T = 1000 # Time samples
 M = 2 # microphones
 N = M # sources
 
 
 #Y =  np.ones((M,T))
 
-mu_init = np.array([0,10.])
-var_init = np.array([2,10.])
+#mu_init = np.array([0,10.,5])
+#var_init = np.array([2,10.,12])
 
-a = HMM(S,T, mu_init, var_init)
+a = HMM(S,T)#, mu_init, var_init)
 x = np.array([ Gsample(0,5) for i in range(T) ])
-#x = np.array([ Gsample(0,4) for i in range(T/2) ] + [ Gsample(20,4) for i in range(T/2) ]) # requires even T
+#x = np.array([ Gsample(0,3) for i in range(T/2) ] + [ Gsample(50,4) for i in range(T/2) ]) # requires even T
 
 
-iterations = 10
+iterations = 20
 
 log_likelihoods = []
 for i in range(iterations):
     a.update(x)
     
-    print "------------------"
+    print "----------   --------"
 #    print "alpha", a.alpha
 #    print "beta", a.beta
 #    print "gamma", a.gamma
