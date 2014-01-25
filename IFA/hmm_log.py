@@ -23,8 +23,11 @@ def gauss_prob(x,mean,var):
     """Returns probability of sampling x from the gaussian"""
     return scipy.stats.norm(mean,var).pdf(x)
 
+def GPDF(x, mu, sigma2):
+    return np.exp(-0.5*np.power(x-mu,2)/sigma2)/np.sqrt(2*np.pi*sigma2)
+
 def GlogPDF(x, mu, sigma2):
-    return -0.5*(np.log(2*np.pi) - np.log(sigma2) - np.power(x-mu,2)/sigma2)
+    return -0.5*(np.log(2*np.pi) + np.log(sigma2) + np.power(x-mu,2)/sigma2)
 
 
 def logsumexp(a):
@@ -41,8 +44,8 @@ class HMM:
         self.T = length
         
         # store mu and var for each state
-        self.mu_states  = np.random.randn(states)
-        self.var_states = np.random.gamma(1,10,states)
+        self.mu_states  = np.ones(states)#np.random.randn(states)
+        self.var_states = np.ones(states)#np.random.gamma(1,10,states)
         
         if mu_init!=None:
             self.mu_states = mu_init
@@ -196,7 +199,7 @@ N = M # sources
 #mu_init = np.array([0,10.,5])
 #var_init = np.array([2,10.,12])
 
-a = HMM(S,T)#, mu_init, var_init)
+
 
 
 
@@ -204,8 +207,8 @@ a = HMM(S,T)#, mu_init, var_init)
 
 # probabilities of selecting each gaussian
 w = [.4, 0.4] 
-mu_w = [0., 50.]
-var_w = [3., 4.]
+mu = [0., 50.]
+var = [5., 4.]
 
 x = np.array([ Gsample(0,5) for i in range(T) ])
 #x = np.asarray([ Gsample(20.,3) for i in range(T/2) ] + [ Gsample(50,4) for i in range(T/2) ]) # requires even T
@@ -213,7 +216,7 @@ x = np.array([ Gsample(0,5) for i in range(T) ])
 
 iterations = 20
 
-
+a = HMM(S,T)#, mu_init, var_init)
 
 log_likelihoods = []
 for i in range(iterations):
