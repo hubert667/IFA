@@ -16,9 +16,9 @@ def Gsample(mean,stddev):
     #return float(np.random.standard_normal(1)*stddev + mean)
     return np.random.standard_normal(1)*stddev + mean
 
-def gauss_prob(x,mean,var):
+def gauss_prob(x,mean,std_dev):
     """Returns probability of sampling x from the gaussian"""
-    return scipy.stats.norm(mean,var).pdf(x)
+    return scipy.stats.norm(mean,std_dev).pdf(x)
 
 
 def unmix(G, Y):
