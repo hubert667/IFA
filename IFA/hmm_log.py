@@ -23,6 +23,10 @@ def gauss_prob(x,mean,var):
     """Returns probability of sampling x from the gaussian"""
     return scipy.stats.norm(mean,var).pdf(x)
 
+def GlogPDF(x, mu, sigma2):
+    return -0.5*(np.log(2*np.pi) - np.log(sigma2) - np.power(x-mu,2)/sigma2)
+
+
 def logsumexp(a):
     B = np.max(a)
     
@@ -63,12 +67,12 @@ class HMM:
       
     def _calc_alphas(self,x):
         # t=1 (t = 0)
-        self.log_alpha[:,0] = np.log(self.pi) + np.log( gauss_prob(x[0], self.mu_states, self.var_states) )
+        self.log_alpha[:,0] = np.log(self.pi) + GlogPDF(x[0], self.mu_states, self.var_states)
         
         # t=2,...,T (t = 1,...,T-1)
         for t in range(1, self.T):
             for s in self.s_range:
-                self.log_alpha[s,t] = np.log(gauss_prob(x[t],self.mu_states[s],self.var_states[s])) + logsumexp(self.log_alpha[:,t-1] + np.log(self.A[:,s]))
+                self.log_alpha[s,t] = GlogPDF(x[t],self.mu_states[s],self.var_states[s]) + logsumexp(self.log_alpha[:,t-1] + np.log(self.A[:,s]))
         
                 
     def _calc_betas(self,x):
@@ -78,7 +82,7 @@ class HMM:
         # t = 1,...,T-1 (t = 0,...,T-2)
         for t in range(self.T-2, -1, -1):
             for s in self.s_range:
-                self.log_beta[s,t] = logsumexp(self.log_beta[:,t+1] + np.log(gauss_prob(x[t+1],self.mu_states,self.var_states)) + np.log(self.A[s]))
+                self.log_beta[s,t] = logsumexp(self.log_beta[:,t+1] + GlogPDF(x[t+1],self.mu_states,self.var_states) + np.log(self.A[s]))
             
             
         
@@ -94,7 +98,7 @@ class HMM:
     
     def log_xi(self, x, s_prime, s, t):
         """ IMPORTANT!: t>0 """           
-        return self.log_alpha[s_prime,t-1] + self.log_beta[s,t] + np.log(gauss_prob(x[t],self.mu_states[s],self.var_states[s])) + np.log(self.A[s_prime,s])
+        return self.log_alpha[s_prime,t-1] + self.log_beta[s,t] + GlogPDF(x[t],self.mu_states[s],self.var_states[s]) + np.log(self.A[s_prime,s])
         
 
     def update(self,x):
@@ -112,7 +116,7 @@ class HMM:
         
         for s in self.s_range:
             sum_gamma_s = np.sum(np.exp(self.log_gamma[s])) # with np.exp(logsumexp(self.log_gamma[s])) doesn't work either
-            print "IT IS 0!!! ", sum_gamma_s
+            print "IT IS 0 - > everything will be nan!!! ", sum_gamma_s
             self.mu_states[s] = np.dot(np.exp(self.log_gamma[s]), x) / sum_gamma_s
             
             self.var_states[s]= np.dot(np.exp(self.log_gamma[s]), np.power(x-self.mu_states[s],2)) / sum_gamma_s
