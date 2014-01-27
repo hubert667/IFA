@@ -25,11 +25,11 @@ w = [.4, 0.4]
 mu_w = [0., 50.]
 var_w = [3., 4.]
 
-x = np.array([ Gsample(0,4) for i in range(T) ])
-#x = np.asarray([ Gsample(20.,3) for i in range(T/2) ] + [ Gsample(50,4) for i in range(T/2) ]) # requires even T
+#x = np.array([ Gsample(0,4) for i in range(T) ])
+x = np.asarray([ Gsample(2,2) for i in range(T/2) ] + [ Gsample(0,4) for i in range(T/2) ]) # requires even T
 #x = GSeqSample(T, .999, w, mu_w, var_w) # persistence of 0.8 creates reasonably noticeable chains when w is close to uniform
 
-iterations = 20
+iterations = 40
 
 log_likelihoods = []
 for i in range(iterations):
@@ -42,7 +42,7 @@ for i in range(iterations):
     print "mu", a.mu_states
     print "var", a.var_states
     print "p(s)", np.sum(a.a, axis=0)/np.sum(a.a)
-#    print "a", a.a
+    print "a", a.a
 #    print "a normalization", np.sum(a.a, axis=1)
     print "log-likelihood =", a.log_likelihood()
     log_likelihoods.append(a.log_likelihood())
