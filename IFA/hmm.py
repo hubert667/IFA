@@ -48,13 +48,10 @@ def Calc_G (G, hmms, X):
     
 def Calc_phi(hmms,t,X):
     """Calculates phi for X for particular timestep for all HMMs"""
-    phi = np.zeros(X.shape[0])
+    phi = np.zeros((X.shape[0],1))
 
     for i in range(X.shape[0]):
-        phi[i] = np.sum(hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states[:])/hmms[i].var_states[:])
-
-        if np.isnan(phi[i]):
-            print "phi[i]=nan", hmms[i].var_states[:], hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states[:])
+        phi[i] = np.sum(hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states)/hmms[i].var_states)
 
     return phi
 

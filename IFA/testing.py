@@ -32,9 +32,7 @@ for t in range(T):
     yy[1,t]=Gsample(mean2,stddev2)
 
 #mixing
-y=np.zeros((N,T))   
-for t in range(T):
-        y[:,t]=unmix(H, yy[:,t])
+y = np.dot(H, yy)
 
 #so it is like using I matrix as a mixing matrix
 
@@ -42,8 +40,8 @@ iterations=200
 freezeIterations=1
 x=np.zeros((N,T))
 for itM in range(iterations):
-    for t in range(T):
-        x[:,t]=unmix(G, y[:,t])
+    
+    x = unmix(G, y)
         
     for it in range(freezeIterations):  
         for i in range(len(HMMs)):
