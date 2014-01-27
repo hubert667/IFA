@@ -152,8 +152,8 @@ class HMM:
         # the sum of xi_s's is the same as the unnormalized a_s's
         self.a = np.copy(self.xi_sum_t) # depending on the situation / upgrade to the final algorithm, copy may be avoided
         for s_prime     in self.s_range:   
-            self.a[s_prime] /= np.sum(self.gamma[s]) 
-            self.a[s_prime] /= np.sum(self.a[s_prime])
+            self.a[s_prime] /= np.sum(self.gamma[s_prime,:-1]) 
+            #self.a[s_prime] /= np.sum(self.a[s_prime])
             
         
         self.pi = self.gamma[:,0] / np.sum(self.gamma[:,0])
