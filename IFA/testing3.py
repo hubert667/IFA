@@ -29,7 +29,7 @@ var_w = [3., 4.]
 x = np.asarray([ Gsample(2,2) for i in range(T/2) ] + [ Gsample(0,4) for i in range(T/2) ]) # requires even T
 #x = GSeqSample(T, .999, w, mu_w, var_w) # persistence of 0.8 creates reasonably noticeable chains when w is close to uniform
 
-iterations = 40
+iterations = 100
 
 log_likelihoods = []
 for i in range(iterations):

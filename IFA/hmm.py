@@ -57,7 +57,7 @@ def Calc_phi(hmms,t,X):
 
     return phi
 
-Eps=0.1 #learning rate for the G matrix
+Eps=0.003 #learning rate for the G matrix
 
 class HMM:
     def __init__(self, states, length, mu_init=None, var_init=None):
@@ -151,7 +151,8 @@ class HMM:
                
         # the sum of xi_s's is the same as the unnormalized a_s's
         self.a = np.copy(self.xi_sum_t) # depending on the situation / upgrade to the final algorithm, copy may be avoided
-        for s_prime     in self.s_range:    
+        for s_prime     in self.s_range:   
+            self.a[s_prime] /= np.sum(self.gamma[s]) 
             self.a[s_prime] /= np.sum(self.a[s_prime])
             
         
