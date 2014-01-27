@@ -9,11 +9,11 @@ N = M # sources
 
 #example of H matrix
 H=np.identity(N)
-H[0,1]=0.5
-H[1,0]=1.5
+#H[0,1]=0.5
+#H[1,0]=1.5
 
 G = np.random.random((N, N))  
-G=np.identity(N)
+#G=np.identity(N)
         
 HMMs = []
 for n in range(N):
