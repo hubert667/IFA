@@ -9,15 +9,18 @@ import numpy as np
 #import math as mt
 import scipy.stats
 import sys
+import random
 
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
 
     #return float(np.random.standard_normal(1)*stddev + mean)
-    return np.random.standard_normal(1)*stddev + mean
+    #return np.random.standard_normal(1)*stddev + mean
+    return random.gauss(mean,stddev)
 
-def gauss_prob(x,mean,std_dev):
+def gauss_prob(x,mean,variance):
     """Returns probability of sampling x from the gaussian"""
+    std_dev=np.sqrt(variance)
     return scipy.stats.norm(mean,std_dev).pdf(x)
 
 

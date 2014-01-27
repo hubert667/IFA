@@ -25,8 +25,8 @@ w = [.4, 0.4]
 mu_w = [0., 50.]
 var_w = [3., 4.]
 
-#x = np.array([ Gsample(0,5) for i in range(T) ])
-x = np.asarray([ Gsample(20.,3) for i in range(T/2) ] + [ Gsample(50,4) for i in range(T/2) ]) # requires even T
+x = np.array([ Gsample(0,4) for i in range(T) ])
+#x = np.asarray([ Gsample(20.,3) for i in range(T/2) ] + [ Gsample(50,4) for i in range(T/2) ]) # requires even T
 #x = GSeqSample(T, .999, w, mu_w, var_w) # persistence of 0.8 creates reasonably noticeable chains when w is close to uniform
 
 iterations = 20

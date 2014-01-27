@@ -10,8 +10,8 @@ import numpy as np
 import sys
 
 
-S = 4 # states
-T = 1000 # Time samples
+S = 2 # states
+T = 2000 # Time samples
 M = 2 # microphones
 N = M # sources
 
@@ -34,4 +34,5 @@ for i in range(iterations):
     print "mu", a.mu_states
     print "var", a.var_states
     print "a", a.a
+    print "log-likelihood =", a.log_likelihood()
     
