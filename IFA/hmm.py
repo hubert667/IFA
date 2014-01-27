@@ -46,12 +46,12 @@ def Calc_G (G, hmms, X):
     G += Eps*(G-Sum/T)
     return G
     
-def Calc_phi(hmms,t,X):
-    """Calculates phi for X for particular timestep for all HMMs"""
-    phi = np.zeros((X.shape[0],1))
+def Calc_phi(hmms,t,x):
+    """Calculates phi for x for particular timestep for all HMMs"""
+    phi = np.zeros((x.shape[0],1))
 
     for i in range(X.shape[0]):
-        phi[i] = np.sum(hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states)/hmms[i].var_states)
+        phi[i] = np.sum(hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_states)/hmms[i].var_states)
 
     return phi
 
