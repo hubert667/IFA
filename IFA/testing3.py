@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from hmm import *
 import numpy as np
 
-S = 4 # states
-T = 1000 # Time samples
+S = 2 # states
+T = 3000 # Time samples
 M = 2 # microphones
 N = M # sources
 
@@ -21,13 +21,26 @@ a = HMM(S,T)#, mu_init, var_init)
 
 
 # probabilities of selecting each gaussian
-w = [.4, 0.4] 
-mu_w = [0., 50.]
-var_w = [3., 4.]
+w = [0.5, 0.5] 
+mu_w = [0., 2.]
+var_w = [4., 2.]
 
 #x = np.array([ Gsample(0,4) for i in range(T) ])
-x = np.asarray([ Gsample(2,2) for i in range(T/2) ] + [ Gsample(0,4) for i in range(T/2) ]) # requires even T
-#x = GSeqSample(T, .999, w, mu_w, var_w) # persistence of 0.8 creates reasonably noticeable chains when w is close to uniform
+#x = np.asarray([ Gsample(2,2) for i in range(T/2) ] + [ Gsample(0,4) for i in range(T/2) ]) # requires even T
+#x = GSeqSample(T, 0.99, w, mu_w, var_w) # persistence of 0.8 creates reasonably noticeable chains when w is close to uniform
+
+
+mean1=0
+stddev1=4
+mean2=2
+stddev2=2
+x=np.zeros(T)
+for t in range(T):
+    val=np.random.rand(1)
+    if val<0.5:
+        x[t]=Gsample(mean1,stddev1)
+    else:
+        x[t]=Gsample(mean2,stddev2)
 
 iterations = 100
 
@@ -44,8 +57,9 @@ for i in range(iterations):
     print "p(s)", np.sum(a.a, axis=0)/np.sum(a.a)
     print "a", a.a
 #    print "a normalization", np.sum(a.a, axis=1)
-    print "log-likelihood =", a.log_likelihood()
-    log_likelihoods.append(a.log_likelihood())
+    like=a.log_likelihood()
+    print "log-likelihood =", like
+    log_likelihoods.append(like)
     
 
 plt.plot(log_likelihoods)

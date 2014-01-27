@@ -67,6 +67,7 @@ class HMM:
         # store mu and var for each state
         self.mu_states  = np.random.randn(states)
         self.var_states = np.random.gamma(1,10,states)
+        self.last_log=-10000000000000
         
         if mu_init!=None:
             self.mu_states = mu_init
@@ -153,7 +154,7 @@ class HMM:
         self.a = np.copy(self.xi_sum_t) # depending on the situation / upgrade to the final algorithm, copy may be avoided
         for s_prime     in self.s_range:   
             self.a[s_prime] /= np.sum(self.gamma[s_prime,:-1]) 
-            #self.a[s_prime] /= np.sum(self.a[s_prime])
+            self.a[s_prime] /= np.sum(self.a[s_prime])
             
         
         self.pi = self.gamma[:,0] / np.sum(self.gamma[:,0])
@@ -164,6 +165,14 @@ class HMM:
         return np.prod(self.c)
         
     def log_likelihood(self):
+        like=np.sum(np.log(self.c))
+        if like<self.last_log:
+            print "Error-likelihood goes down"
+            sys.exit(0)
+        elif like-self.last_log<0.001:
+            print "Likelihood is not changing"
+            sys.exit(0)
+        self.last_log=like
         return np.sum(np.log(self.c))
 
 
