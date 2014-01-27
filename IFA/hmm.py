@@ -57,7 +57,7 @@ def Calc_phi(hmms,t,X):
 
     return phi
 
-Eps=0.003 #learning rate for the G matrix
+Eps=0.04 #learning rate for the G matrix
 
 class HMM:
     def __init__(self, states, length, mu_init=None, var_init=None):

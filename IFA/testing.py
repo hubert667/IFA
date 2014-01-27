@@ -3,17 +3,17 @@ import numpy as np
 
 
 S = 2 # states
-T = 1000# Time samples
+T = 2000# Time samples
 M = 2 # microphones
 N = M # sources
 
 #example of H matrix
 H=np.identity(N)
-#H[0,1]=0.5
-#H[1,0]=1.5
+H[0,1]=0.5
+H[1,0]=1.5
 
-G = np.random.random((N, N))  
-#G=np.identity(N)
+#G = np.random.random((N, N))  
+G=np.identity(N)
         
 HMMs = []
 for n in range(N):
@@ -38,8 +38,8 @@ for t in range(T):
 
 #so it is like using I matrix as a mixing matrix
 
-iterations=20
-freezeIterations=20
+iterations=200
+freezeIterations=1
 x=np.zeros((N,T))
 for itM in range(iterations):
     for t in range(T):
