@@ -22,7 +22,7 @@ a = HMM(S,T)
 x = np.array([ Gsample(0,4) for i in range(T) ])
 
 
-iterations = 10
+iterations = 100
 
 
 for i in range(iterations):

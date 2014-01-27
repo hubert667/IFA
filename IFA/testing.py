@@ -12,8 +12,8 @@ H=np.identity(N)
 H[0,1]=0.5
 H[1,0]=1.5
 
-#G = np.random.random((N, N))  
-G=np.identity(N)
+G = np.random.random((N, N))
+#G=np.identity(N)
         
 HMMs = []
 for n in range(N):
@@ -22,8 +22,8 @@ for n in range(N):
 
 mean1=0
 stddev1=4
-mean2=1
-stddev2=2
+mean2=0
+stddev2=1
 
 #oryginal sources
 yy=np.zeros((N,T))

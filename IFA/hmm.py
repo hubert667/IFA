@@ -40,6 +40,7 @@ def Calc_G (G, hmms, X):
     Sum=0    
     for t in range(T):
         phi = Calc_phi(hmms,t,X[:,t])
+        #phi = Calc_phi_other_way(hmms,t,X[:,t])
         result=np.reshape(phi,(phi.shape[0],1))*X[:,t].T
         Sum += np.dot(result,G)
     G += Eps*(G-Sum/T)
@@ -57,7 +58,13 @@ def Calc_phi(hmms,t,X):
 
     return phi
 
-Eps=0.04 #learning rate for the G matrix
+def Calc_phi_other_way(hmms,t,X):
+    phi = np.zeros(X.shape[0])
+    
+    phi=np.arctan(X)
+    return phi
+
+Eps=0.01 #learning rate for the G matrix
 
 class HMM:
     def __init__(self, states, length, mu_init=None, var_init=None):
