@@ -61,6 +61,29 @@ def Calc_phi_other_way(hmms,t,X):
     phi=np.arctan(X)
     return phi
 
+def ICA(X, activation_function, learning_rate=0.01, max_iterations = 100000):
+    
+    W = 0.01 * numpy.random.rand(X.shape[0],X.shape[0])
+   
+    for i in range(max_iterations):
+        A  = W.dot(X)
+        Z  = activation_function(A)
+        Xp = W.T.dot(A)
+
+        dW = W + Z.dot(Xp.T) / X.shape[1]
+        W += learning_rate * dW
+        
+        Wsum = numpy.absolute(dW).sum()
+        
+        if numpy.isnan(Wsum) or numpy.isinf(Wsum):
+            print "Failed convergence!"
+            break
+        if np.linalg.norm(dW) < 1e-5:
+            print "Early solution! :)"
+            break
+  
+    return W
+
 Eps=0.01 #learning rate for the G matrix
 
 class HMM:
