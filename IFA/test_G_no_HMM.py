@@ -9,16 +9,16 @@ N = M # sources
 
 #example of H matrix
 H=np.identity(N)
-H[0,1]=0.5
-H[1,0]=0.25
-H /= np.linalg.norm(H)
+#H[0,1]=0.5
+#H[1,0]=0.25
+#H /= np.linalg.norm(H)
 
-G = 0.001 * np.random.random((N, N))
+G = 0.01* np.random.random((N, N))
 #G=np.identity(N)
         
 HMMs = [ HMM(S,T) for n in range(N) ]
 
-Eps=0.00001 #learning rate for the G matrix
+Eps=0.0001 #learning rate for the G matrix
 
 mean1=0.
 stddev1=6.
@@ -43,7 +43,6 @@ for t in range(T):
     yy[1,t]=Gsample(mean2,stddev2)
 
 #mixing
- 
 y = np.dot(H, yy)
         
 
@@ -57,7 +56,7 @@ for itM in range(iterations):
     G = Calc_G(G,HMMs,x, Eps)
 
     print "-------------------"
-    print "G:", G
+    print "G:", G/G[0,0]
     eG = G - np.linalg.inv(H)
     egs.append(np.linalg.norm(eG))
     NeG = G/np.linalg.norm(G) - np.linalg.inv(H)/np.linalg.norm(np.linalg.inv(H))    
