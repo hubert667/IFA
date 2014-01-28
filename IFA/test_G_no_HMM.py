@@ -9,8 +9,8 @@ N = M # sources
 
 #example of H matrix
 H=np.identity(N)
-H[0,1]=0.5
-H[1,0]=0.25
+#H[0,1]=0.5
+#H[1,0]=0.25
 #H /= np.linalg.norm(H)
 
 G =  np.random.random((N, N))
@@ -46,9 +46,9 @@ for t in range(T):
 y = np.dot(H, yy)
         
 
-iterations=50
-egs =  [inf]
-negs = [inf]
+iterations=5000
+egs =  [10000000000]
+negs = [10000000000]
 for itM in range(iterations):
     x = unmix(G, y)  
 #    for i in range(len(HMMs)):
@@ -71,10 +71,10 @@ for itM in range(iterations):
         
     if egs[-1] > egs[-2] and len(egs)>5: # sometimes fails right at the first step, does it fail after? yes and probably when it fails after it would fail at the beginning as well.
         print "Error in G increased."
-        break
+        #break
     if negs[-1] > negs[-2] and len(negs)>5:
         print "Error in normalized G increased."
-        break
+        #break
     
 
 plt.plot(egs[1:])

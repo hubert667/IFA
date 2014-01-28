@@ -31,14 +31,14 @@ for t in range(T):
 
 #mixing
  
-#y = np.dot(H, yy)
+y = np.dot(H, yy)
         
 
 #so it is like using I matrix as a mixing matrix
 
 iterations=50
-egs =  [inf]
-negs = [inf]
+egs =  [10000]
+negs = [10000]
 for itM in range(iterations):
     x = unmix(G, y)  
     for i in range(len(HMMs)):
