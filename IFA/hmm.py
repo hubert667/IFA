@@ -46,15 +46,16 @@ def Calc_G (G, hmms, X):
     G += Eps*(G-Sum/T)
     return G
     
-def Calc_phi(hmms,t,X):
-    """Calculates phi for X for particular timestep for all HMMs"""
-    phi = np.zeros(X.shape[0])
+def Calc_phi(hmms,t,x):
+    """Calculates phi for x for particular timestep for all HMMs"""
+    phi = np.zeros(x.shape[0])
 
-    for i in range(X.shape[0]):
-        phi[i] = np.sum(hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states[:])/hmms[i].var_states[:])
+    for i in range(x.shape[0]):
+        phi[i] = np.sum(hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_states[:])/hmms[i].var_states[:])
 
         if np.isnan(phi[i]):
-            print "phi[i]=nan", hmms[i].var_states[:], hmms[i].gamma[:,t]*(X[i]-hmms[i].mu_states[:])
+            print "phi[%d]=nan" % i, hmms[i].var_states[:], hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_states[:])
+            e(i)
 
     return phi
 
@@ -64,7 +65,7 @@ def Calc_phi_other_way(hmms,t,X):
     phi=np.arctan(X)
     return phi
 
-Eps=0.01 #learning rate for the G matrix
+Eps=0.001 #learning rate for the G matrix
 
 class HMM:
     def __init__(self, states, length, mu_init=None, var_init=None):
@@ -96,6 +97,8 @@ class HMM:
         self.xi_sum_t = np.empty((states,states), dtype=float)      
       
         self.s_range = np.arange(self.S)
+        
+        
       
     def _calc_alphas(self,x):
         # t=1 (t = 0)

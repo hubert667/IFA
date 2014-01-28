@@ -1,24 +1,22 @@
 from hmm import *
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 S = 2 # states
-T = 3000# Time samples
+T = 1000# Time samples
 M = 2 # microphones
 N = M # sources
 
 #example of H matrix
 H=np.identity(N)
 H[0,1]=0.5
-H[1,0]=1.5
+H[1,0]=0.25
+H /= np.linalg.norm(H)
 
 G = np.random.random((N, N))
 #G=np.identity(N)
         
-HMMs = []
-for n in range(N):
-    HMMs.append(HMM(S,T))
-    
+HMMs = [ HMM(S,T) for n in range(N) ]
 
 mean1=0
 stddev1=4
@@ -32,32 +30,37 @@ for t in range(T):
     yy[1,t]=Gsample(mean2,stddev2)
 
 #mixing
-y=np.zeros((N,T))   
-for t in range(T):
-        y[:,t]=unmix(H, yy[:,t])
+ 
+#y = np.dot(H, yy)
+        
 
 #so it is like using I matrix as a mixing matrix
 
-iterations=200
-freezeIterations=1
-x=np.zeros((N,T))
+iterations=50
+egs = []
+negs = []
 for itM in range(iterations):
-    for t in range(T):
-        x[:,t]=unmix(G, y[:,t])
-        
-    for it in range(freezeIterations):  
-        for i in range(len(HMMs)):
-            HMMs[i].update(x[i,:])
-    for it in range(freezeIterations):
-        G = Calc_G(G,HMMs,x)
+    x = unmix(G, y)  
+    for i in range(len(HMMs)):
+        HMMs[i].update(x[i])
+    G = Calc_G(G,HMMs,x)
 
     print "-------------------"
     print "G:", G
+    eG = G - H
+    egs.append(np.linalg.norm(eG))
+    NeG = G/np.linalg.norm(G) - H/np.linalg.norm(H)    
+    negs.append(np.linalg.norm(NeG))
+    print "eG", eG, egs[-1]
+    print "NeG", NeG, negs[-1]
     print "mu",HMMs[0].mu_states
     print "var",HMMs[0].var_states
     print "mu",HMMs[1].mu_states
     print "var",HMMs[1].var_states
     
+
+plt.plot(egs)
+plt.plot(negs)
 
 #print HMMs[0].gamma
 
