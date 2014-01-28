@@ -59,7 +59,7 @@ for itM in range(iterations):
         print "LogLs", HMMs[hmm_i].log_likelihood()
         HMMs[hmm_i].log_likelihood_check()
         
-    if egs[-1] > egs[-2] and len(egs)>5: # sometimes fails right at the first step, does it fail after? it seems so and probably when it fails at first will eventually or right after fail 
+    if egs[-1] > egs[-2] and len(egs)>5: # sometimes fails right at the first step, does it fail after? yes and probably when it fails after it would fail at the beginning as well.
         print "Error in G increased."
         break
     if negs[-1] > negs[-2] and len(egs)>5:
