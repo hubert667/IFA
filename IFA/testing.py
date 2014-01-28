@@ -37,8 +37,8 @@ for t in range(T):
 #so it is like using I matrix as a mixing matrix
 
 iterations=50
-egs = []
-negs = []
+egs =  [np.linalg.norm(G-np.linalg.inv(H))]
+negs = [np.linalg.norm(G/np.linalg.norm(G)-np.linalg.inv(H)/np.linalg.norm(np.linalg.inv(H)))]
 for itM in range(iterations):
     x = unmix(G, y)  
     for i in range(len(HMMs)):
@@ -47,9 +47,9 @@ for itM in range(iterations):
 
     print "-------------------"
     print "G:", G
-    eG = G - H
+    eG = G - np.linalg.inv(H)
     egs.append(np.linalg.norm(eG))
-    NeG = G/np.linalg.norm(G) - H/np.linalg.norm(H)    
+    NeG = G/np.linalg.norm(G) - np.linalg.inv(H)/np.linalg.norm(np.linalg.inv(H))    
     negs.append(np.linalg.norm(NeG))
     print "eG", eG, egs[-1]
     print "NeG", NeG, negs[-1]
@@ -60,6 +60,13 @@ for itM in range(iterations):
         print "var",   HMMs[hmm_i].var_states
         print "LogLs", HMMs[hmm_i].log_likelihood()
         HMMs[hmm_i].log_likelihood_check()
+        
+    if egs[-1] > egs[-2]:
+        print "Error in G increased."
+        break
+    if negs[-1] > negs[-2]:
+        print "Error in normalized G increased."
+        break
     
 
 plt.plot(egs)
