@@ -4,18 +4,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 S = 2 # states
-T = 5000# Time samples
+T = 3000# Time samples
 M = 2 # microphones
 N = M # sources
 
 #example of H matrix
 H=np.identity(N)
-H[0,1]=0.5
-H[1,0]=0.25
+#H[0,1]=0.5
+#H[1,0]=0.25
 H /= np.linalg.norm(H)
 #H^-1=[1.73,-0.86;-0.43,1,73]
 
-G = np.random.random((N, N))*0.01
+G = np.random.random((N, N))
 #G=np.identity(N)
         
 
@@ -46,7 +46,7 @@ y = np.dot(H, yy)
 
 #so it is like using I matrix as a mixing matrix
 
-iterations=50
+iterations=500
 egs = []
 negs = []
 for itM in range(iterations):

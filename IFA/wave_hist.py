@@ -18,7 +18,7 @@ def GetData(source,size):
     sample_rate, wave_data = scipy.io.wavfile.read(filepath)
     wave_data=wave_data[5000:5000+size]
     wave_data=wave_data.astype(float)
-    wave_data/=np.max(wave_data)
+    wave_data/=np.mean(wave_data)
     g=P.hist(wave_data[:], bins = 50)
     #P.show(g)
     #print wave_data.size
