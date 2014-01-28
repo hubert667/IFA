@@ -31,9 +31,9 @@ var_w = [4., 2.]
 
 
 mean1=0
-stddev1=4
-mean2=2
-stddev2=2
+stddev1=10
+mean2=0
+stddev2=0.5
 x=np.zeros(T)
 for t in range(T):
     val=np.random.rand(1)
@@ -58,6 +58,7 @@ for i in range(iterations):
     print "a", a.a
 #    print "a normalization", np.sum(a.a, axis=1)
     like=a.log_likelihood()
+    a.log_likelihood_check()
     print "log-likelihood =", like
     log_likelihoods.append(like)
     

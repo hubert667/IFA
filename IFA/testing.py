@@ -19,9 +19,9 @@ G = np.random.random((N, N))
 HMMs = [ HMM(S,T) for n in range(N) ]
 
 mean1=0
-stddev1=4
+stddev1=6
 mean2=0
-stddev2=1
+stddev2=0.5
 
 #oryginal sources
 yy=np.zeros((N,T))
@@ -53,10 +53,13 @@ for itM in range(iterations):
     negs.append(np.linalg.norm(NeG))
     print "eG", eG, egs[-1]
     print "NeG", NeG, negs[-1]
-    print "mu",HMMs[0].mu_states
-    print "var",HMMs[0].var_states
-    print "mu",HMMs[1].mu_states
-    print "var",HMMs[1].var_states
+    for hmm_i in range(len(HMMs)):
+        print "mu" ,   HMMs[hmm_i].mu_states
+        print "var",   HMMs[hmm_i].var_states
+        print "mu" ,   HMMs[hmm_i].mu_states
+        print "var",   HMMs[hmm_i].var_states
+        print "LogLs", HMMs[hmm_i].log_likelihood()
+        HMMs[hmm_i].log_likelihood_check()
     
 
 plt.plot(egs)

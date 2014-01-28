@@ -174,8 +174,11 @@ class HMM:
 
     def likelihood(self):
         return np.prod(self.c)
-        
+    
     def log_likelihood(self):
+        return np.sum(np.log(self.c))    
+    
+    def log_likelihood_check(self):
         like=np.sum(np.log(self.c))
         if like<self.last_log:
             print "Error-likelihood goes down"
@@ -184,7 +187,7 @@ class HMM:
             print "Likelihood is not changing"
             sys.exit(0)
         self.last_log=like
-        return np.sum(np.log(self.c))
+        return like
 
 
 def discretePDF2CDF(w):

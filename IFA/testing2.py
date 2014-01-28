@@ -22,6 +22,7 @@ a = HMM(S,T)
 x = np.array([ Gsample(0,4) for i in range(T) ])
 
 
+
 iterations = 100
 
 
@@ -35,4 +36,5 @@ for i in range(iterations):
     print "var", a.var_states
     print "a", a.a
     print "log-likelihood =", a.log_likelihood()
+    a.log_likelihood_check()
     
