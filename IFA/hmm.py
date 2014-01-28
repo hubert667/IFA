@@ -33,7 +33,7 @@ def AbsTotalError(A,B):
     """ Returns the absolute elementwise error between 2 matrices. """
     return np.sum(np.abs(A-B))
 
-def Calc_G (G, hmms, X):
+def Calc_G (G, hmms, X, epsilon=0.1):
     """Returns a new G matrix after update. Each column of X contain data from different sources for the same timestep """
     T = X.shape[1]
     
@@ -43,7 +43,7 @@ def Calc_G (G, hmms, X):
         #phi = Calc_phi_other_way(hmms,t,X[:,t])
         result=np.reshape(phi,(phi.shape[0],1))*X[:,t].T
         Sum += np.dot(result,G)
-    G += Eps*(G-Sum/T)
+    G += epsilon*(G-Sum/T)
     return G
     
 def Calc_phi(hmms,t,x):
@@ -51,10 +51,10 @@ def Calc_phi(hmms,t,x):
     phi = np.zeros(x.shape[0])
 
     for i in range(x.shape[0]):
-        phi[i] = np.sum(hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_states[:])/hmms[i].var_states[:])
+        phi[i] = np.sum(hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_states)/hmms[i].var_states)
 
         if np.isnan(phi[i]):
-            print "phi[%d]=nan" % i, hmms[i].var_states[:], hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_states[:])
+            print "phi[%d]=nan" % i, hmms[i].var_states, hmms[i].mu_states, hmms[i].gamma[:,t], hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_states[:])
             e(i)
 
     return phi
@@ -65,7 +65,7 @@ def Calc_phi_other_way(hmms,t,X):
     phi=np.arctan(X)
     return phi
 
-Eps=0.001 #learning rate for the G matrix
+
 
 class HMM:
     def __init__(self, states, length, mu_init=None, var_init=None):
@@ -86,7 +86,8 @@ class HMM:
             print "Overriding random initialization..."
         
         self.alpha = np.empty((states, length))        
-        self.beta  = np.ones((states, length))
+        self.beta  = np.ones ((states, length))
+        self.gamma = np.empty((states, length))        
         
         self.c = np.empty(length)
         
