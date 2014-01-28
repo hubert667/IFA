@@ -65,7 +65,7 @@ def Calc_phi_other_way(hmms,t,X):
     phi=np.arctan(X)
     return phi
 
-Eps=0.001 #learning rate for the G matrix
+Eps=0.01 #learning rate for the G matrix
 
 class HMM:
     def __init__(self, states, length, mu_init=None, var_init=None):
