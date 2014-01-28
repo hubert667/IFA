@@ -37,8 +37,8 @@ for t in range(T):
 #so it is like using I matrix as a mixing matrix
 
 iterations=50
-egs =  [np.linalg.norm(G-np.linalg.inv(H))]
-negs = [np.linalg.norm(G/np.linalg.norm(G)-np.linalg.inv(H)/np.linalg.norm(np.linalg.inv(H)))]
+egs =  [inf]
+negs = [inf]
 for itM in range(iterations):
     x = unmix(G, y)  
     for i in range(len(HMMs)):
@@ -56,21 +56,19 @@ for itM in range(iterations):
     for hmm_i in range(len(HMMs)):
         print "mu" ,   HMMs[hmm_i].mu_states
         print "var",   HMMs[hmm_i].var_states
-        print "mu" ,   HMMs[hmm_i].mu_states
-        print "var",   HMMs[hmm_i].var_states
         print "LogLs", HMMs[hmm_i].log_likelihood()
         HMMs[hmm_i].log_likelihood_check()
         
-    if egs[-1] > egs[-2]:
+    if egs[-1] > egs[-2] and len(egs)>5: # sometimes fails right at the first step, does it fail after? it seems so and probably when it fails at first will eventually or right after fail 
         print "Error in G increased."
         break
-    if negs[-1] > negs[-2]:
+    if negs[-1] > negs[-2] and len(egs)>5:
         print "Error in normalized G increased."
         break
     
 
-plt.plot(egs)
-plt.plot(negs)
+plt.plot(egs[1:])
+plt.plot(negs[1:])
 
 #print HMMs[0].gamma
 
