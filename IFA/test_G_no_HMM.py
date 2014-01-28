@@ -9,16 +9,16 @@ N = M # sources
 
 #example of H matrix
 H=np.identity(N)
-#H[0,1]=0.5
-#H[1,0]=0.25
+H[0,1]=0.5
+H[1,0]=0.25
 #H /= np.linalg.norm(H)
 
-G = 0.01* np.random.random((N, N))
+G =  np.random.random((N, N))
 #G=np.identity(N)
         
 HMMs = [ HMM(S,T) for n in range(N) ]
 
-Eps=0.0001 #learning rate for the G matrix
+Eps=0.01 #learning rate for the G matrix
 
 mean1=0.
 stddev1=6.
