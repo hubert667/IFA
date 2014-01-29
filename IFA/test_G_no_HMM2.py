@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 S = 2 # states
-T = 200# Time samples
+T = 100# Time samples
 M = 2 # microphones
 N = M # sources
 
@@ -25,8 +25,9 @@ G =  np.random.random((N, N))
 
         
 HMMs = [ HMM(S,T) for n in range(N) ]
+realHMMs = [ HMM(S,T) for n in range(N) ]
 
-Eps=0.1 #learning rate for the G matrix
+Eps=0.05 #learning rate for the G matrix
 
 mean1=0.
 var1=6.
@@ -59,7 +60,7 @@ for t in range(T):
 y = np.dot(H, x0)
         
 
-iterations=200
+iterations=300
 egs =  [np.inf]
 negs = [np.inf]
 increased_eG = False
@@ -77,8 +78,9 @@ for itM in range(iterations):
     y = np.dot(H, x0)
     
     x = unmix(G, y)  
-#    for i in range(len(HMMs)):
-#        HMMs[i].update(x[i])
+    #for i in range(len(HMMs)):
+    #    realHMMs[i].update(x[i])
+    #G = Calc_G(G,realHMMs,x, Eps)
     G = Calc_G(G,HMMs,x, Eps)
 
     print "-------------------"

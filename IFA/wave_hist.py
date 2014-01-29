@@ -11,15 +11,22 @@ import pylab as P
 
 
 wave_filepaths = ["mike.wav", "beet.wav"]
+max_size=100000
+wave_datas=np.zeros((2,max_size))
+def ReadFile():
+    for i in range(2):
+        filepath=wave_filepaths[i]
+        sample_rate, temp = scipy.io.wavfile.read(filepath)
+        wave_datas[i,:]=temp[10000:max_size+10000]
 
-def GetData(source,size):
+def GetData(source,size,period):
     """"""
-    filepath=wave_filepaths[source]
-    sample_rate, wave_data = scipy.io.wavfile.read(filepath)
-    wave_data=wave_data[5000:5000+size]
+
+    wave_data = wave_datas[source,:]
+    wave_data=wave_data[period*size:period*size+size]
     wave_data=wave_data.astype(float)
     wave_data/=np.max(wave_data)
-    g=P.hist(wave_data[:], bins = 50)
+    #g=P.hist(wave_data[:], bins = 50)
     #P.show(g)
     #print wave_data.size
     return wave_data
