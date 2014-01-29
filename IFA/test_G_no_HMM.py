@@ -83,21 +83,3 @@ if increased_NeG: print "Error in normalized G increased."
     
 plt.plot(egs[1:])
 plt.plot(negs[1:])
-
-#print HMMs[0].gamma
-
-
-
-HMMs[0].gamma[0,0] = 0.75
-HMMs[0].gamma[1,0] = 0.25
-HMMs[0].mu_states[1] = 0.3
-HMMs[0].var_states[1] = 0.4
-
-
-HMMs[1].gamma[0,0] = 0.75
-HMMs[1].gamma[1,0] = 0.25
-HMMs[1].mu_states[1] = 0.2
-HMMs[1].var_states[1] = 0.6
-
-HMMs[0].p()
-HMMs[1].p()
