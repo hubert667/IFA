@@ -9,6 +9,43 @@ from hmm import *
 import numpy as np
 import matplotlib.pyplot as plt
 
+def ICA(Y, hmms, learning_rate=0.01, max_iterations = 100000):
+   
+    N = Y.shape[0]   
+    T = Y.shape[1]
+   
+    W = 0.01 * numpy.random.rand(N,N)
+
+    Z = np.empty((N,T))  
+    for i in range(max_iterations):
+        X  = W.dot(Y)
+        #Z  = activation_function(X)
+        for t in range(T):
+            Z[:,t] = Calc_phi(hmms, t, X[:,t])
+        
+        
+        Yp = W.T.dot(X)
+
+        dW = W - Z.dot(Yp.T) / T
+        W += learning_rate * dW
+       
+        Wsum = numpy.absolute(dW).sum()
+
+        print W
+        print np.linalg.norm(dW)       
+       
+        print "E:", np.linalg.norm(W-np.eye(N))       
+       
+        if numpy.isnan(Wsum) or numpy.isinf(Wsum):
+            print "Failed convergence!"
+            break
+        if np.linalg.norm(dW) < 1e-5:
+            print "Early solution! :)"
+            break
+ 
+    return W
+
+
 S = 2 # states
 T = 1000# Time samples
 M = 2 # microphones
@@ -64,6 +101,13 @@ negs = [np.inf]
 increased_eG = False
 increased_NeG = False
 print "Running..."
+
+G = ICA(y, HMMs)
+
+print G
+
+e(0)
+
 for itM in range(iterations):
     x = unmix(G, y)  
 #    for i in range(len(HMMs)):
