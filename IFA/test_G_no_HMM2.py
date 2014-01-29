@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 S = 2 # states
-T = 10# Time samples
+T = 4000# Time samples
 M = 2 # microphones
 N = M # sources
 
@@ -25,7 +25,7 @@ G =  np.random.random((N, N))
         
 HMMs = [ HMM(S,T) for n in range(N) ]
 
-Eps=0.001 #learning rate for the G matrix
+Eps=0.04 #learning rate for the G matrix
 
 mean1=0.
 var1=6.
@@ -35,12 +35,12 @@ var2=0.5
 
 HMMs[0].gamma[:,0] = 1/float(S)
 HMMs[0].mu_states = np.array([0., 1.2])
-HMMs[0].var_states = np.array([0.3, 20.])
+HMMs[0].var_states = np.array([0.3, 2.])
 
 
 HMMs[1].gamma[:,:] = 1/float(S)
 HMMs[1].mu_states = np.array([0., 2.])
-HMMs[1].var_states = np.array([0.6, 50.])
+HMMs[1].var_states = np.array([0.6, 5.])
 
 
 #original sources
@@ -51,8 +51,8 @@ for t in range(T):
     g = int(np.random.rand(1)>0.5)
     HMMs[0].gamma[g,t] = 1.
     HMMs[1].gamma[g,t] = 1.
-    x0[0,t] = Gsample(HMMs[0].mu_states[g],sqrt(HMMs[0].var_states[g]))
-    x0[1,t] = Gsample(HMMs[1].mu_states[g],sqrt(HMMs[1].var_states[g]))
+    x0[0,t] = Gsample(HMMs[0].mu_states[g],np.sqrt(HMMs[0].var_states[g]))
+    x0[1,t] = Gsample(HMMs[1].mu_states[g],np.sqrt(HMMs[1].var_states[g]))
 
 #mixing
 y = np.dot(H, x0)
