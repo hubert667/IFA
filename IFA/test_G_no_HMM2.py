@@ -9,12 +9,12 @@ from hmm import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-def ICA(Y, hmms, learning_rate=0.01, max_iterations = 100000):
+def ICA(Y, hmms, learning_rate=0.0001, max_iterations = 100000):
    
     N = Y.shape[0]   
     T = Y.shape[1]
    
-    W = 0.01 * numpy.random.rand(N,N)
+    W = np.eye(N)#0.01 * numpy.random.rand(N,N)
 
     Z = np.empty((N,T))  
     for i in range(max_iterations):
