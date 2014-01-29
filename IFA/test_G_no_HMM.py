@@ -9,9 +9,9 @@ N = M # sources
 
 #example of H matrix
 H=np.identity(N)
-#H[0,1]=0.5
-#H[1,0]=0.25
-#H /= np.linalg.norm(H)
+H[0,1]=0.5
+H[1,0]=0.25
+H /= np.linalg.norm(H)
 
 G =  np.random.random((N, N))
 #G=np.identity(N)
@@ -46,9 +46,11 @@ for t in range(T):
 y = np.dot(H, yy)
         
 
-iterations=5000
-egs =  [10000000000]
-negs = [10000000000]
+iterations=50
+egs =  [np.inf]
+negs = [np.inf]
+increased_eG = False
+increased_NeG = False
 for itM in range(iterations):
     x = unmix(G, y)  
 #    for i in range(len(HMMs)):
@@ -70,13 +72,15 @@ for itM in range(iterations):
         #HMMs[hmm_i].log_likelihood_check()
         
     if egs[-1] > egs[-2] and len(egs)>5: # sometimes fails right at the first step, does it fail after? yes and probably when it fails after it would fail at the beginning as well.
-        print "Error in G increased."
-        #break
+        increased_eG = True
+        break
     if negs[-1] > negs[-2] and len(negs)>5:
-        print "Error in normalized G increased."
-        #break
+        increased_NeG = True
+        break
     
-
+if increased_eG:  print "Error in G increased."
+if increased_NeG: print "Error in normalized G increased."
+    
 plt.plot(egs[1:])
 plt.plot(negs[1:])
 

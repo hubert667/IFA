@@ -55,7 +55,7 @@ def Calc_phi(hmms,t,x):
 
         if np.isnan(phi[i]):
             print "phi[%d]=nan" % i, hmms[i].var_states, hmms[i].mu_states, hmms[i].gamma[:,t], hmms[i].gamma[:,t]*(x[i]-hmms[i].mu_states[:])
-            #e(i)
+            e(i)
 
     return phi
 
