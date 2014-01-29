@@ -6,7 +6,6 @@ Created on Tue Jan 14 02:25:10 2014
 """
 
 import numpy as np
-#import math as mt
 import scipy.stats
 import sys
 import random
@@ -17,7 +16,6 @@ def e(s=1):
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
 
-    #return float(np.random.standard_normal(1)*stddev + mean)
     #return np.random.standard_normal(1)*stddev + mean
     return random.gauss(mean,stddev)
 
