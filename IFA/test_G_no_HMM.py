@@ -1,4 +1,5 @@
 from hmm import *
+from wave_hist import *
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -9,9 +10,10 @@ N = M # sources
 
 #example of H matrix
 H=np.identity(N)
-H[0,1]=0.5
-H[1,0]=0.25
-H /= np.linalg.norm(H)
+#H[0,1]=0.5
+#H[1,0]=0.25
+#H /= np.linalg.norm(H)
+#H^-1=[1.73,-0.86;-0.43,1,73]
 
 G =  np.random.random((N, N))
 #G=np.identity(N)
@@ -38,15 +40,23 @@ HMMs[1].var_states[:] = stddev2
 
 #oryginal sources
 yy=np.zeros((N,T))
+
+
+
 for t in range(T):
     yy[0,t]=Gsample(mean1,stddev1)
     yy[1,t]=Gsample(mean2,stddev2)
+    
+yy=np.zeros((N,T))
+yy[0,:]=GetData(0,T)
+yy[1,:]=GetData(1,T)
 
+    
 #mixing
 y = np.dot(H, yy)
         
 
-iterations=50
+iterations=500
 egs =  [np.inf]
 negs = [np.inf]
 increased_eG = False
@@ -73,10 +83,10 @@ for itM in range(iterations):
         
     if egs[-1] > egs[-2] and len(egs)>5: # sometimes fails right at the first step, does it fail after? yes and probably when it fails after it would fail at the beginning as well.
         increased_eG = True
-        break
+        #break
     if negs[-1] > negs[-2] and len(negs)>5:
         increased_NeG = True
-        break
+        #break
     
 if increased_eG:  print "Error in G increased."
 if increased_NeG: print "Error in normalized G increased."

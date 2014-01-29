@@ -7,12 +7,13 @@ S = 2 # states
 T = 3000# Time samples
 M = 2 # microphones
 N = M # sources
+eps=0.01
 
 #example of H matrix
 H=np.identity(N)
 #H[0,1]=0.5
 #H[1,0]=0.25
-H /= np.linalg.norm(H)
+#H /= np.linalg.norm(H)
 #H^-1=[1.73,-0.86;-0.43,1,73]
 
 G = np.random.random((N, N))
@@ -55,7 +56,7 @@ for itM in range(iterations):
     x = unmix(G, y)  
     for i in range(len(HMMs)):
         HMMs[i].update(x[i])
-    G = Calc_G(G,HMMs,x)
+    G = Calc_G(G,HMMs,x,eps)
 
     print "-------------------"
     print "mu",HMMs[0].mu_states

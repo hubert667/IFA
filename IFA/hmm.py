@@ -43,7 +43,7 @@ def Calc_G (G, hmms, X, epsilon=0.1):
         #phi = Calc_phi_other_way(hmms,t,X[:,t])
         result=np.reshape(phi,(phi.shape[0],1))*X[:,t].T
         Sum += np.dot(result,G)
-    G += epsilon*(G-Sum/T)
+    G += epsilon*(G+Sum/T)
     return G
     
 def Calc_phi(hmms,t,x):
@@ -62,7 +62,8 @@ def Calc_phi(hmms,t,x):
 def Calc_phi_other_way(hmms,t,X):
     phi = np.zeros(X.shape[0])
     
-    phi=np.arctan(X)
+    #phi=np.arctan(X)
+    phi=6*X/ (X**2.0 + 5.0)
     return phi
 
 
@@ -158,7 +159,7 @@ class HMM:
             sum_gamma_s = np.sum(self.gamma[s])
             
             self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma_s
-            self.mu_states[s]=0
+            #self.mu_states[s]=0
             
             self.var_states[s]= np.dot(self.gamma[s], np.power(x-self.mu_states[s],2)) / sum_gamma_s
                
