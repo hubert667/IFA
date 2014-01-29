@@ -4,15 +4,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 S = 2 # states
-T = 3000# Time samples
-M = 2 # microphones
+T = 4000# Time samples
+M = 2 # microphoneerratics
 N = M # sources
+Eps=0.05 #learning rate for the G matrix
 
 #example of H matrix
 H=np.identity(N)
 #H[0,1]=0.5
 #H[1,0]=0.25
-H /= np.linalg.norm(H)
+#H /= np.linalg.norm(H)
 #H^-1=[1.73,-0.86;-0.43,1,73]
 
 G = np.random.random((N, N))
@@ -32,7 +33,7 @@ yy[1,:]=GetData(1,T)
 
 variances=np.zeros((N,S))
 for i in range(M):
-    variances[i]=np.abs(np.random.randn(S)*max(yy[i,:])*10)
+    variances[i]=np.abs(np.random.randn(S)*max(yy[i,:]))
 HMMs = [ HMM(S,T,[0]*S,variances[n]) for n in range(N) ]
 #for t in range(T):
     #yy[0,t]=Gsample(mean1,stddev1)
@@ -48,14 +49,14 @@ y = np.dot(H, yy)
 
 
 iterations=50
-egs =  [10000]
-negs = [10000]
+egs =  [np.inf]
+negs = [np.inf]
 
 for itM in range(iterations):
     x = unmix(G, y)  
     for i in range(len(HMMs)):
         HMMs[i].update(x[i])
-    G = Calc_G(G,HMMs,x)
+    G = Calc_G(G,HMMs,x,Eps=0.05)
 
     print "-------------------"
     print "mu",HMMs[0].mu_states
@@ -77,10 +78,10 @@ for itM in range(iterations):
         
     if egs[-1] > egs[-2] and len(egs)>5: # sometimes fails right at the first step, does it fail after? yes and probably when it fails after it would fail at the beginning as well.
         print "Error in G increased."
-        break
+        #break
     if negs[-1] > negs[-2] and len(egs)>5:
         print "Error in normalized G increased."
-        break
+        #break
     
 
 plt.plot(egs[1:])
