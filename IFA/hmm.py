@@ -63,7 +63,7 @@ def Calc_phi(hmms,t,x):
 def Calc_phi_other_way(hmms,t,X):
     phi = np.zeros(X.shape[0])
     
-    phi=np.arctan(X)
+    phi=np.tanh(X) # positive since our formula has a different sign than the original ICA
     return phi
 
 
