@@ -189,6 +189,9 @@ class HMM:
             sys.exit(0)
         self.last_log=like
         return like
+    def p(self):
+        print "mu:",self.mu_states,"var:",self.var_states,"gamma:"
+        print self.gamma
 
 
 def discretePDF2CDF(w):
