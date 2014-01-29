@@ -11,6 +11,9 @@ import scipy.stats
 import sys
 import random
 
+def e(s=1):
+    sys.exit(s)
+
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
 
@@ -199,8 +202,7 @@ def discretePDF2CDF(w):
         w[i] += w[i-1]
     return w/w[-1] # normalizes in case the input wasn't
 
-def e(s=1):
-    sys.exit(s)
+
 
 def discreteInvCDF(CDF,x):
     " Returns the class of the CDF to which x belongs. "
