@@ -10,7 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 S = 2 # states
-T = 10# Time samples
+T = 1000# Time samples
 M = 2 # microphones
 N = M # sources
 
@@ -25,7 +25,7 @@ G =  np.random.random((N, N))
         
 HMMs = [ HMM(S,T) for n in range(N) ]
 
-Eps=0.001 #learning rate for the G matrix
+Eps=0.1 #learning rate for the G matrix
 
 mean1=0.
 var1=6.
@@ -58,40 +58,42 @@ for t in range(T):
 y = np.dot(H, x0)
         
 
-iterations=500
+iterations=5000
 egs =  [np.inf]
 negs = [np.inf]
 increased_eG = False
 increased_NeG = False
+print "Running..."
 for itM in range(iterations):
     x = unmix(G, y)  
 #    for i in range(len(HMMs)):
 #        HMMs[i].update(x[i])
     G = Calc_G(G,HMMs,x, Eps)
 
-    print "-------------------"
-    print "G:", G/G[0,0]
+    #print "-------------------"
+    #print "G:", G/G[0,0]
     eG = G - np.linalg.inv(H)
     egs.append(np.linalg.norm(eG))
-    NeG = G/np.linalg.norm(G) - np.linalg.inv(H)/np.linalg.norm(np.linalg.inv(H))    
-    negs.append(np.linalg.norm(NeG))
-    print "eG", eG, egs[-1]
-    print "NeG", NeG, negs[-1]
-    for hmm_i in range(len(HMMs)):
-        print "mu" ,   HMMs[hmm_i].mu_states
-        print "var",   HMMs[hmm_i].var_states
+    #NeG = G/np.linalg.norm(G) - np.linalg.inv(H)/np.linalg.norm(np.linalg.inv(H))    
+    #negs.append(np.linalg.norm(NeG))
+    #print "eG", eG, egs[-1]
+    #print "NeG", NeG, negs[-1]
+#    for hmm_i in range(len(HMMs)):
+#        print "mu" ,   HMMs[hmm_i].mu_states
+#        print "var",   HMMs[hmm_i].var_states
         #print "LogLs", HMMs[hmm_i].log_likelihood()
         #HMMs[hmm_i].log_likelihood_check()
         
-    if egs[-1] > egs[-2] and len(egs)>5: # sometimes fails right at the first step, does it fail after? yes and probably when it fails after it would fail at the beginning as well.
+    if egs[-1]-egs[-2] > 0.001:
         increased_eG = True
+        break
         
-    if negs[-1] > negs[-2] and len(negs)>5:
-        increased_NeG = True
         
     
 if increased_eG:  print "Error in G increased."
-if increased_NeG: print "Error in normalized G increased."
+#if increased_NeG: print "Error in normalized G increased."
     
 plt.plot(egs[1:])
 #plt.plot(negs[1:])
+plt.xlabel("Iterations")
+plt.ylabel("G error $| G - H^{-1}|$")
