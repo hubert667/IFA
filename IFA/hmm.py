@@ -36,16 +36,15 @@ def AbsTotalError(A,B):
 
 def Calc_G (G, hmms, X, epsilon=0.1):
     """Returns a new G matrix after update. Each column of X contain data from different sources for the same timestep """
+    N = X.shape[0]        
     T = X.shape[1]
-    
-    Sum=0    
+        
+    psi=np.zeros((N,N))
     for t in range(T):
         phi = Calc_phi(hmms,t,X[:,t])
         #phi = Calc_phi_other_way(hmms,t,X[:,t])
-        result=np.reshape(phi,(phi.shape[0],1))*X[:,t].T
-        Sum += np.dot(result,G)
-    G += epsilon*(G-Sum/T)
-    return G
+        psi += phi.reshape(N,1)*X[:,t].T
+    return G + epsilon*(G-np.dot(psi,G)/T) 
     
 def Calc_phi(hmms,t,x):
     """Calculates phi for x for particular timestep for all HMMs"""
