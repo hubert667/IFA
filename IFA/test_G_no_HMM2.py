@@ -8,6 +8,7 @@ Created on Wed Jan 29 15:12:33 2014
 from hmm import *
 import numpy as np
 import matplotlib.pyplot as plt
+import scipy.io.wavfile
 
 def ICA(Y, hmms, learning_rate=0.0001, max_iterations = 100000):
    
