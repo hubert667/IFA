@@ -1,43 +1,24 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Jan 30 10:10:33 2014
-
-@author: AlbertoEAF
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan 30 08:43:26 2014
-
-@author: AlbertoEAF
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Wed Jan 29 15:12:33 2014
 
 @author: AlbertoEAF
 """
 
-#from hmm import *
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io.wavfile
 import sys
 
-def e(i):
-    sys.exit(i)
-
 activation_functions = [lambda a: -np.tanh(a),    lambda a: -a + np.tanh(a),                 lambda a: -a ** 3.0,             lambda a: - (6 * a) / ( a ** 2.0 + 5.0)]
 p_from_act_functions = [lambda a: 1 / np.cosh(a), lambda a: np.cosh(a) * np.exp(-0.5 * a ** 2.), lambda a: np.exp(-0.25 * a ** 4.), lambda a: (a ** 2. + 5.0) ** (-3.)     ]
-
 
 def dAmari(W,W0):
     """ 
     Returns the Amari distance between two permutation-invariant matrices and row-scale invariant. 
     W0 is the perfect unmixing matrix and W the estimated one. 
     """
-    r = np.abs(np.dot(W0,np.linalg.inv(W))) # L1 element-wise norm?
+    r = np.abs(np.dot(W0,np.linalg.inv(W))) # L1 element-wise norm
         
     d1 = np.sum(np.sum(r,axis=1)/np.max(r,axis=1) - 1)
     d2 = np.sum(np.sum(r,axis=0)/np.max(r,axis=0) - 1)
@@ -52,7 +33,7 @@ def GetData(filepath, start=0, size=100, plot_hist=1, hist_bins=50):
 
     if start+size > len(wave_data):
         print "File doesn't contain that many samples!"
-        e(3)
+        sys.exit(3)
     
     wave_data = wave_data[start:start+size]
     
@@ -64,7 +45,7 @@ def GetData(filepath, start=0, size=100, plot_hist=1, hist_bins=50):
 
     if np.sum(wave_data) == 0:
         print "No data in this section!"
-        e(2)
+        sys.exit(2)
     
     wave_data = wave_data.astype(float)
     #wave_data/=np.max(np.abs(wave_data))
@@ -72,7 +53,7 @@ def GetData(filepath, start=0, size=100, plot_hist=1, hist_bins=50):
     return wave_data
 
 
-def ICA(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, max_iterations = 1000000):
+def ICA(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, max_iterations = 10000):
    
     W = 1e-2 * np.eye(X.shape[0]) # 1e-2 * np.random.rand(X.shape[0],X.shape[0])
     
@@ -80,16 +61,17 @@ def ICA(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, ma
   
     for i in range(max_iterations):
         A  = W.dot(X)
+        
         Z  = activation_function(A)
+        #print Z
         Xp = W.T.dot(A)
 
         dW = W + Z.dot(Xp.T) / X.shape[1]
         W += learning_rate * dW
        
         Wsum = np.absolute(dW).sum()
-              
        
-        print W/np.sum(W,axis=0)
+        #print W/np.sum(W,axis=0)
         
         error.append(dAmari(W,W0))
 
@@ -126,6 +108,6 @@ G,eG = ICA(y, np.linalg.inv(H))#, activation_functions[3])
 plt.figure()
 plt.plot(eG)
 plt.xlabel("Iterations")
-plt.ylabel("G error $| G - H^{-1}|$")
+plt.ylabel("G error")
 
 print G/np.sum(G,axis=1)
