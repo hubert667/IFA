@@ -10,24 +10,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 S = 2 # states
-T = 100# Time samples
+T = 500# Time samples
 M = 2 # microphones
 N = M # sources
 
 #example of H matrix
 H=np.identity(N)
-#H[0,1]=0.5
-#H[1,0]=0.25
-#H /= np.linalg.norm(H)
+H[0,1]=0.5
+H[1,0]=0.25
+H /= np.linalg.norm(H)
 #H^-1=[1.73,-0.86;-0.43,1,73]
 
-G =  np.random.random((N, N))
-
+#G =  np.random.random((N, N))
+G=  np.identity((N))
         
 HMMs = [ HMM(S,T) for n in range(N) ]
 realHMMs = [ HMM(S,T) for n in range(N) ]
 
-Eps=0.05 #learning rate for the G matrix
+Eps=0.02 #learning rate for the G matrix
 
 mean1=0.
 var1=6.
@@ -78,10 +78,10 @@ for itM in range(iterations):
     y = np.dot(H, x0)
     
     x = unmix(G, y)  
-    #for i in range(len(HMMs)):
-    #    realHMMs[i].update(x[i])
-    #G = Calc_G(G,realHMMs,x, Eps)
-    G = Calc_G(G,HMMs,x, Eps)
+    for i in range(len(HMMs)):
+        realHMMs[i].update(x[i])
+    G = Calc_G(G,realHMMs,x, Eps)
+    #G = Calc_G(G,HMMs,x, Eps)
 
     print "-------------------"
     print "G:", G/G[0,0]
@@ -92,8 +92,8 @@ for itM in range(iterations):
     print "eG", eG, egs[-1]
     print "NeG", NeG, negs[-1]
     for hmm_i in range(len(HMMs)):
-        print "mu" ,   HMMs[hmm_i].mu_states
-        print "var",   HMMs[hmm_i].var_states
+        print "mu" ,   realHMMs[hmm_i].mu_states
+        print "var",   realHMMs[hmm_i].var_states
         #print "LogLs", HMMs[hmm_i].log_likelihood()
         #HMMs[hmm_i].log_likelihood_check()
         

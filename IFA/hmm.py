@@ -158,7 +158,7 @@ class HMM:
             sum_gamma_s = np.sum(self.gamma[s])
             
             self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma_s
-            self.mu_states[s]=0
+            #self.mu_states[s]=0
             
             self.var_states[s]= np.dot(self.gamma[s], np.power(x-self.mu_states[s],2)) / sum_gamma_s
                

@@ -17,7 +17,7 @@ H=np.identity(N)
 #H^-1=[1.73,-0.86;-0.43,1,73]
 
 G = np.random.random((N, N))
-#G=np.identity(N)
+G=np.identity(N)
         
 mean1=0
 stddev1=6
@@ -34,6 +34,16 @@ variances=np.zeros((N,S))
 for i in range(M):
     variances[i]=np.abs(np.random.randn(S)*max(yy[i,:]))
 HMMs = [ HMM(S,T,[0]*S,variances[n]) for n in range(N) ]
+"""
+HMMs[0].gamma[:,0] = 1/float(S)
+HMMs[0].mu_states = np.array([0.14, 0.14])
+HMMs[0].var_states = np.array([0.089, 0.089])
+
+
+HMMs[1].gamma[:,:] = 1/float(S)
+HMMs[1].mu_states = np.array([0.03, 0.003])
+HMMs[1].var_states = np.array([0.137, 0.137])
+"""
 #for t in range(T):
     #yy[0,t]=Gsample(mean1,stddev1)
     #yy[1,t]=Gsample(mean2,stddev2)
@@ -56,7 +66,7 @@ for itM in range(iterations):
     x = unmix(G, y)  
     for i in range(len(HMMs)):
         HMMs[i].update(x[i])
-    G = Calc_G(G,HMMs,x,Eps)
+    #G = Calc_G(G,HMMs,x,Eps)
 
     print "-------------------"
     print "mu",HMMs[0].mu_states
