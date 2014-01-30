@@ -25,7 +25,8 @@ def GetData(source,size,period):
     wave_data = wave_datas[source,:]
     wave_data=wave_data[period*size:period*size+size]
     wave_data=wave_data.astype(float)
-    wave_data/=np.max(wave_data)
+    wave_data/=np.max(wave_datas)
+    #wave_data/=np.max(wave_data)
     #g=P.hist(wave_data[:], bins = 50)
     #P.show(g)
     #print wave_data.size

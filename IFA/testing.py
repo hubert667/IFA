@@ -3,8 +3,8 @@ from wave_hist import *
 import numpy as np
 import matplotlib.pyplot as plt
 
-S = 2 # states
-T = 800# Time samples
+S = 4 # states
+T = 1000# Time samples
 M = 2 # microphoneerratics
 N = M # sources
 Eps=0.05 #learning rate for the G matrix
