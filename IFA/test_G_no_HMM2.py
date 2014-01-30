@@ -42,6 +42,8 @@ HMMs[0].mu_states = np.array([0., 0.3])
 HMMs[0].var_states = np.array([0.8, 1])
 
 
+
+
 HMMs[1].gamma[:,:] = 1/float(S)
 HMMs[1].mu_states = np.array([0., 0.5])
 HMMs[1].var_states = np.array([0.6, 0.3])
@@ -60,9 +62,8 @@ for t in range(T):
 
 #mixing
 y = np.dot(H, x0)
-        
 
-iterations=200
+iterations=50
 egs =  [np.inf]
 negs = [np.inf]
 increased_eG = False
