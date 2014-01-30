@@ -166,12 +166,8 @@ plt.plot(eG)
 plt.xlabel("Iterations")
 plt.ylabel("G error $| G - H^{-1}|$")
 
-plt.figure()
-plt.plot(eG2)
-plt.xlabel("Iterations")
-plt.ylabel("G error $| G - H^{-1}|$")
 
 
-print G/np.sum(G,axis=0)
-print G2/np.sum(G2,axis=0)
+print G/np.sum(G,axis=1)
+
 e(0)
