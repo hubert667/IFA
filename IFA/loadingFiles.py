@@ -24,12 +24,13 @@ def load_data():
         wav_data.append(data[5000:150000])  # cut off the last part so that all signals have same length
     return sample_rate
 
-def GetData(source,size,period):
+def GetData(source,size,period,norm=1):
     """"""
     data = wav_data[source]
     data=data[period*size:period*size+size]
     data=data.astype(float)
-    data/=np.max(wav_data)
+    if norm==1:
+        data/=np.max(wav_data)
     return data
 
 def GetAllData(source):

@@ -23,7 +23,7 @@ p_from_act_functions = [lambda a: 1 / np.cosh(a), lambda a: np.cosh(a) * np.exp(
 
 def ICA(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, max_iterations = 1000000):
    
-    W = np.eye(X.shape[0]) # 1e-2 * np.random.rand(X.shape[0],X.shape[0])
+    W = 0.01*np.eye(X.shape[0]) # 1e-2 * np.random.rand(X.shape[0],X.shape[0])
     
     error = [np.inf]  
   

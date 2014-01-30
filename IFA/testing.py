@@ -10,8 +10,8 @@ S = 2 # states
 T = 5000# Time samples
 M = 2 # microphoneerratics
 N = M # sources
-Eps=0.05 #learning rate for the G matrix
-iterations=20
+Eps=0.01 #learning rate for the G matrix
+iterations=50
 
 #example of H matrix
 H=np.identity(N)
@@ -25,8 +25,8 @@ G=np.identity(N)
 
 sample_rate=load_data()
 yy=np.zeros((N,T))
-yy[0,:]=GetData(0,T,0)
-yy[1,:]=GetData(1,T,0)
+yy[0,:]=GetData(0,T,0,0)
+yy[1,:]=GetData(1,T,0,0)
 y = np.dot(H, yy)  
 
 G_ICA, error_ICA=ICA(y, H1,activation_function=lambda a: -np.tanh(a), learning_rate=Eps, max_iterations = iterations)
@@ -41,7 +41,6 @@ for i in range(M):
 HMMs = [ HMM(S,T,[0]*S,variances[n]) for n in range(N) ]
 
 difs =  []
-
 for itM in range(iterations):
     #if itM==50:
     #    Eps=0.05
