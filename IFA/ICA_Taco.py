@@ -105,7 +105,7 @@ def ICA(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, ma
             print "Early solution! :)"
             break
  
-    return W, error
+    return W, error[1:]
 
 def ICATaco(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, stop = 1e-5):
     """ W0 is the perfect unmixing matrix. """    
@@ -137,18 +137,21 @@ def ICATaco(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01
         
         changeW = np.linalg.norm(Wgrad)
 
-    return W, error
+    return W, error[1:]
 
 S = 2 # states
 T = 150000# Time samples
 M = 2 # microphones
 N = M # sources
-       
+      
+      
 
 iterations=5000
 print "Running..."
 
 H = np.eye(N)
+H[1,0] = 0.34
+H[1,1] = 0.2
 X = np.empty((N,T))
 X[0] = GetData("mike.wav", 6000, T)
 X[1] = GetData("beet.wav", 6000, T)
