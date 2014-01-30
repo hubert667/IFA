@@ -152,6 +152,7 @@ print "Running..."
 H = np.eye(N)
 H[1,0] = 0.34
 H[1,1] = 0.2
+H[1,0] = 0.3
 X = np.empty((N,T))
 X[0] = GetData("mike.wav", 6000, T)
 X[1] = GetData("beet.wav", 6000, T)
