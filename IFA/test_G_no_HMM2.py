@@ -88,8 +88,8 @@ for t in range(T):
     g = int(np.random.rand(1)>0.5)
     HMMs[0].gamma[g,t] = 1.
     HMMs[1].gamma[g,t] = 1.
-    x0[0,t] = Gsample(HMMs[0].mu_states[g],sqrt(HMMs[0].var_states[g]))
-    x0[1,t] = Gsample(HMMs[1].mu_states[g],sqrt(HMMs[1].var_states[g]))
+    x0[0,t] = Gsample(HMMs[0].mu_states[g],np.sqrt(HMMs[0].var_states[g]))
+    x0[1,t] = Gsample(HMMs[1].mu_states[g],np.sqrt(HMMs[1].var_states[g]))
 
 #mixing
 y = np.dot(H, x0)
