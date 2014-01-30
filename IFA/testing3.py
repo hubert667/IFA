@@ -4,7 +4,7 @@ from hmm import *
 import numpy as np
 
 S = 2 # states
-T = 3000 # Time samples
+T = 600 # Time samples
 M = 2 # microphones
 N = M # sources
 
@@ -31,16 +31,16 @@ var_w = [4., 2.]
 
 
 mean1=0
-stddev1=10
-mean2=0
-stddev2=0.5
+stddev1=0.8
+mean2=0.3
+stddev2=1
 x=np.zeros(T)
 for t in range(T):
     val=np.random.rand(1)
     if val<0.5:
-        x[t]=Gsample(mean1,stddev1)
+        x[t]=Gsample(mean1,np.sqrt(stddev1))
     else:
-        x[t]=Gsample(mean2,stddev2)
+        x[t]=Gsample(mean2,np.sqrt(stddev2))
 
 iterations = 100
 

@@ -10,7 +10,7 @@ import scipy.io.wavfile
 import pylab as P
 
 
-wave_filepaths = ["mike.wav", "beet.wav"]
+wave_filepaths = ["mike.wav", "street.wav"]
 max_size=100000
 wave_datas=np.zeros((2,max_size))
 def ReadFile():

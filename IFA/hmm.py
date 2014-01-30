@@ -12,6 +12,16 @@ import random
 
 def e(s=1):
     sys.exit(s)
+    
+def dAmari(W,W0):
+    """
+    Returns the Amari distance between two permutation-invariant matrices and row-scale invariant.
+    W0 is the perfect unmixing matrix and W the estimated one.
+    """
+    r = np.abs(np.dot(W0,np.linalg.inv(W))) # L1 element-wise norm?
+    d1 = np.sum(np.sum(r,axis=1)/np.max(r,axis=1) - 1)
+    d2 = np.sum(np.sum(r,axis=0)/np.max(r,axis=0) - 1)
+    return 1/(2*float(r.shape[0])) * (d1 + d2)
 
 def Gsample(mean,stddev):
     """ Returns a sample from a normal with parameters mean and stddev. """
