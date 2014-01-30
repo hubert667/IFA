@@ -36,13 +36,13 @@ var2=0.5
 
 
 HMMs[0].gamma[:,0] = 1/float(S)
-HMMs[0].mu_states = np.array([0., 1.2])
-HMMs[0].var_states = np.array([0.3, 2.])
+HMMs[0].mu_states = np.array([0., 0.3])
+HMMs[0].var_states = np.array([4.8, 5.2])
 
 
 HMMs[1].gamma[:,:] = 1/float(S)
-HMMs[1].mu_states = np.array([0., 2.])
-HMMs[1].var_states = np.array([0.6, 5.])
+HMMs[1].mu_states = np.array([0., 0.5])
+HMMs[1].var_states = np.array([9.6, 10])
 
 
 #original sources
@@ -53,8 +53,8 @@ for t in range(T):
     g = int(np.random.rand(1)>0.5)
     HMMs[0].gamma[g,t] = 1.
     HMMs[1].gamma[g,t] = 1.
-    x0[0,t] = Gsample(HMMs[0].mu_states[g],np.sqrt(HMMs[0].var_states[g]))
-    x0[1,t] = Gsample(HMMs[1].mu_states[g],np.sqrt(HMMs[1].var_states[g]))
+    #x0[0,t] = Gsample(HMMs[0].mu_states[g],np.sqrt(HMMs[0].var_states[g]))
+    #x0[1,t] = Gsample(HMMs[1].mu_states[g],np.sqrt(HMMs[1].var_states[g]))
 
 #mixing
 y = np.dot(H, x0)
@@ -81,10 +81,11 @@ for itM in range(iterations):
     for i in range(len(HMMs)):
         realHMMs[i].update(x[i])
     G = Calc_G(G,realHMMs,x, Eps)
+
     #G = Calc_G(G,HMMs,x, Eps)
 
     print "-------------------"
-    print "G:", G/G[0,0]
+    print "G:", G
     eG = G - np.linalg.inv(H)
     egs.append(np.linalg.norm(eG))
     NeG = G/np.linalg.norm(G) - np.linalg.inv(H)/np.linalg.norm(np.linalg.inv(H))    

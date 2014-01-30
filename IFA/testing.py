@@ -4,16 +4,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 S = 2 # states
-T = 2000# Time samples
+T = 800# Time samples
 M = 2 # microphoneerratics
 N = M # sources
 Eps=0.05 #learning rate for the G matrix
 
 #example of H matrix
 H=np.identity(N)
-#H[0,1]=0.5
-#H[1,0]=0.25
-#H /= np.linalg.norm(H)
+H[0,1]=0.5
+H[1,0]=0.25
+H /= np.linalg.norm(H)
 #H^-1=[1.73,-0.86;-0.43,1,73]
 
 G = np.random.random((N, N))
@@ -60,13 +60,13 @@ egs =  [np.inf]
 negs = [np.inf]
 
 for itM in range(iterations):
-    #yy[0,:]=GetData(0,T,itM)
-    #yy[1,:]=GetData(1,T,itM)
+    yy[0,:]=GetData(0,T,itM)
+    yy[1,:]=GetData(1,T,itM)
     y = np.dot(H, yy)
     x = unmix(G, y)  
     for i in range(len(HMMs)):
         HMMs[i].update(x[i])
-    #G = Calc_G(G,HMMs,x,Eps)
+    G = Calc_G(G,HMMs,x,Eps)
 
     print "-------------------"
     print "mu",HMMs[0].mu_states

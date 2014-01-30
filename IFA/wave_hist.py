@@ -17,7 +17,7 @@ def ReadFile():
     for i in range(2):
         filepath=wave_filepaths[i]
         sample_rate, temp = scipy.io.wavfile.read(filepath)
-        wave_datas[i,:]=temp[10000:max_size+10000]
+        wave_datas[i,:]=temp[50000:max_size+50000]
 
 def GetData(source,size,period):
     """"""
