@@ -15,7 +15,6 @@ Created on Wed Jan 29 15:12:33 2014
 from hmm import *
 import numpy as np
 import matplotlib.pyplot as plt
-import pylab as P
 import scipy.io.wavfile
 
 activation_functions = [lambda a: -tanh(a),    lambda a: -a + tanh(a),                 lambda a: -a ** 3,             lambda a: - (6 * a) / ( a ** 2 + 5.0)]

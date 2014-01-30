@@ -22,7 +22,6 @@ Created on Wed Jan 29 15:12:33 2014
 from hmm import *
 import numpy as np
 import matplotlib.pyplot as plt
-import pylab as P
 import scipy.io.wavfile
 
 activation_functions = [lambda a: -tanh(a),    lambda a: -a + tanh(a),                 lambda a: -a ** 3,             lambda a: - (6 * a) / ( a ** 2 + 5.0)]
@@ -50,7 +49,7 @@ def GetData(filepath, start=0, size=100, plot_hist=1, hist_bins=50):
         e(2)
     
     wave_data = wave_data.astype(float)
-    wave_data/=np.max(wave_data)
+    #wave_data/=np.max(np.abs(wave_data))
 
     
     return wave_data
@@ -72,10 +71,10 @@ def ICA(X, perfectW, activation_function, learning_rate=0.01, max_iterations = 1
        
         Wsum = np.absolute(dW).sum()
        
-        print W
+        print W, perfectW
         
         error.append(np.linalg.norm(W-perfectW))     
-        if error[-1] - error[-2] > 0.0001:
+        if error[-1] - error[-2] > 0.00001:
             print "Error increasing!"
             break       
         if numpy.isnan(Wsum) or numpy.isinf(Wsum):
@@ -110,6 +109,6 @@ plt.plot(eG)
 plt.xlabel("Iterations")
 plt.ylabel("G error $| G - H^{-1}|$")
 
-print G
+print G/G[0,0]
 
 e(0)
