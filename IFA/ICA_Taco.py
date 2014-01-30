@@ -75,7 +75,7 @@ def GetData(filepath, start=0, size=100, plot_hist=1, hist_bins=50):
 
 def ICA(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, max_iterations = 1000000):
    
-    W = 1e-2 * np.random.rand(X.shape[0],X.shape[0])
+    W = 1e-2 * np.eye(X.shape[0]) # 1e-2 * np.random.rand(X.shape[0],X.shape[0])
     
   
     error = [np.inf]  
@@ -95,7 +95,7 @@ def ICA(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, ma
         
         error.append(dAmari(W,W0))
 
-        if error[-1] - error[-2] > 0.00001:
+        if error[-1] - error[-2] > 0.1:
             print "Error increasing!"
             break       
         if np.isnan(Wsum) or np.isinf(Wsum):
@@ -110,7 +110,7 @@ def ICA(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, ma
 def ICATaco(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, stop = 1e-5):
     """ W0 is the perfect unmixing matrix. """    
     
-    W= 1e-2 * np.random.rand(X.shape[0], X.shape[0]);
+    W= 1e-2* np.eye(X.shape[0])#1e-2 * np.random.rand(X.shape[0], X.shape[0]);
     
     print "Running Taco's ICA"
     
