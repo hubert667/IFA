@@ -68,7 +68,7 @@ def ICA(X, perfectW, activation_function, learning_rate=0.01, max_iterations = 1
         print W
         
         error.append(np.linalg.norm(W-perfectW))     
-        if error[-1] - error[-2] > 0.01:
+        if error[-1] - error[-2] > 0.0001:
             print "Error increasing!"
             break       
         if numpy.isnan(Wsum) or numpy.isinf(Wsum):
@@ -183,7 +183,7 @@ X[0] = GetData("mike.wav", 6000, T)
 X[1] = GetData("beet.wav", 6000, T)
 y = np.dot(H,X)
 
-G,eG = ICA(y, np.linalg.inv(H), activation_functions[3])
+G,eG = ICA(y, np.linalg.inv(H), activation_functions[1])
 
 plt.figure()
 plt.plot(eG)
