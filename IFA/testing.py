@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 from ccm.Utils import Label
 
 S = 2 # states
-T = 5000# Time samples
+T = 2000# Time samples
 M = 2 # microphoneerratics
 N = M # sources
 Eps=0.01 #learning rate for the G matrix
-iterations=50
+iterations=20
 
 #example of H matrix
 H=np.identity(N)
@@ -32,6 +32,7 @@ y = np.dot(H, yy)
 G_ICA, error_ICA=ICA(y, H1,activation_function=lambda a: -np.tanh(a), learning_rate=Eps, max_iterations = iterations)
 #G_ICA, error_ICA=ICA(y, H1,activation_function=lambda a: - (6 * a) / ( a ** 2.0 + 5.0), learning_rate=Eps, max_iterations = iterations)
 #T = 1000# Time samples
+Eps=0.05
 yy=np.zeros((N,T))
 yy[0,:]=GetData(0,T,0)
 yy[1,:]=GetData(1,T,0)
@@ -44,7 +45,7 @@ difs =  []
 for itM in range(iterations):
     #if itM==50:
     #    Eps=0.05
-    #yy[0,:]=GetData(0,T,itM)
+   # yy[0,:]=GetData(0,T,itM)
     #yy[1,:]=GetData(1,T,itM)
     y = np.dot(H, yy)
     x = unmix(G, y)  

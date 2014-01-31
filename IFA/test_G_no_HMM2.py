@@ -6,11 +6,12 @@ Created on Wed Jan 29 15:12:33 2014
 """
 
 from hmm import *
+from ICA import *
 import numpy as np
 import matplotlib.pyplot as plt
 
 S = 2 # states
-T = 600# Time samples
+T = 2000# Time samples
 M = 2 # microphones
 N = M # sources
 
@@ -54,16 +55,21 @@ x0=np.zeros((N,T))
 HMMs[0].gamma[:,:] = 0.
 HMMs[1].gamma[:,:] = 0.
 for t in range(T):
-    g = int(np.random.rand(1)>0.5)
+    #g = int(np.random.rand(1)>0.5)
+    g=int(T/(t+1))
+    if g>1:
+        g=1
     HMMs[0].gamma[g,t] = 1.
     HMMs[1].gamma[g,t] = 1.
     x0[0,t] = Gsample(HMMs[0].mu_states[g],np.sqrt(HMMs[0].var_states[g]))
     x0[1,t] = Gsample(HMMs[1].mu_states[g],np.sqrt(HMMs[1].var_states[g]))
 
 #mixing
+iterations=50
 y = np.dot(H, x0)
 
-iterations=50
+G_ICA, error_ICA=ICA(y, H1,activation_function=lambda a: -np.tanh(a), learning_rate=Eps, max_iterations = iterations)
+
 egs =  [np.inf]
 negs = [np.inf]
 increased_eG = False
@@ -98,4 +104,10 @@ for itM in range(iterations):
         
 
     
-plt.show(plt.plot(difs[1:]))
+plt.figure()
+plt.xlabel("Iterations")
+plt.ylabel("G error (Amari)")
+plt.plot(error_ICA,label="ICA")
+plt.plot(difs,label="IFA with HMMs")
+plt.legend( loc='upper left', numpoints = 1 )
+plt.show()
