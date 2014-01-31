@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 #from ccm.Utils import Label
 
+source_files = ['mike.wav', 'street.wav']
 S = 2 # states
 T = 2000# Time samples
 M = 2 # microphoneerratics
@@ -23,7 +24,7 @@ H1=np.linalg.inv(H)
 
 G=np.identity(N)
 
-sample_rate=load_data()
+sample_rate=load_data(source_files)
 yy=np.zeros((N,T))
 yy[0,:]=GetData(0,T,0,0)
 yy[1,:]=GetData(1,T,0,0)

@@ -11,9 +11,9 @@ def save_data(X,name,sample_rate):
     for i in range(X.shape[0]):
         save_wav(X[i], name + str(i) + '.wav', sample_rate)
         
-def load_data():
+def load_data(source_files):
     #source_files = ['beet.wav', 'beet9.wav', 'beet92.wav', 'mike.wav', 'street.wav']
-    source_files = ['mike.wav', 'street.wav']
+    
     sample_rate = None
     for f in source_files:
         sr, data = scipy.io.wavfile.read(f)
