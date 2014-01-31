@@ -54,29 +54,3 @@ def ICA(X, W0, activation_function=lambda a: -np.tanh(a), learning_rate=0.01, ma
  
     return W, error[1:]
 
-"""
-S = 2 # states
-T = 150000# Time samples
-M = 2 # microphones
-N = M # sources
-      
-iterations=5000
-
-H = np.eye(N)
-#H[1,0] = 0.34
-#H[1,1] = 0.2
-#H[1,0] = 0.3
-X = np.empty((N,T))
-X[0] = GetData("mike.wav", 6000, T)
-X[1] = GetData("beet.wav", 6000, T)
-y = np.dot(H,X)
-
-G,eG = ICA(y, np.linalg.inv(H))#, activation_functions[3])
-
-plt.figure()
-plt.plot(eG)
-plt.xlabel("Iterations")
-plt.ylabel("G error $| G - H^{-1}|$")
-
-print G/np.sum(G,axis=1)
-"""

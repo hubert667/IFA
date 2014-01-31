@@ -4,7 +4,7 @@ from loadingFiles import *
 from ICA import *
 import numpy as np
 import matplotlib.pyplot as plt
-from ccm.Utils import Label
+#from ccm.Utils import Label
 
 S = 2 # states
 T = 2000# Time samples
