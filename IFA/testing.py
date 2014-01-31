@@ -45,7 +45,7 @@ difs =  []
 for itM in range(iterations):
     #if itM==50:
     #    Eps=0.05
-   # yy[0,:]=GetData(0,T,itM)
+    #yy[0,:]=GetData(0,T,itM)
     #yy[1,:]=GetData(1,T,itM)
     y = np.dot(H, yy)
     x = unmix(G, y)  
