@@ -31,8 +31,8 @@ var_w = [4., 2.]
 
 
 mean1=0
-stddev1=10
-mean2=0
+stddev1=0.2
+mean2=20
 stddev2=0.5
 x=np.zeros(T)
 for t in range(T):

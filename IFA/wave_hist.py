@@ -10,13 +10,13 @@ import scipy.io.wavfile
 import pylab as P
 
 
-wave_filepaths = ["mike.wav", "beet.wav"]
+wave_filepaths = ["mike.wav", "hi_low.wav"]
 
 def GetData(source,size):
     """"""
-    filepath=wave_filepaths[source]
+    filepath=source
     sample_rate, wave_data = scipy.io.wavfile.read(filepath)
-    wave_data=wave_data[5000:5000+size]
+    wave_data=wave_data[0:0+size]
     wave_data=wave_data.astype(float)
     wave_data/=np.max(wave_data)
     g=P.hist(wave_data[:], bins = 50)

@@ -158,7 +158,7 @@ class HMM:
             sum_gamma_s = np.sum(self.gamma[s])
             
             self.mu_states[s] = np.dot(self.gamma[s], x) / sum_gamma_s
-            self.mu_states[s]=0
+            #self.mu_states[s]=0
             
             self.var_states[s]= np.dot(self.gamma[s], np.power(x-self.mu_states[s],2)) / sum_gamma_s
                
@@ -184,7 +184,7 @@ class HMM:
         if like<self.last_log:
             print "Error-likelihood goes down"
             sys.exit(0)
-        elif like-self.last_log<0.001:
+        elif like-self.last_log<1e-5:
             print "Likelihood is not changing"
             sys.exit(0)
         self.last_log=like
